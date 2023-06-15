@@ -3,15 +3,15 @@ plugins {
     id 'org.jetbrains.kotlin.android'
 }
 
-android {
-    namespace 'com.example.upiapp'
-    compileSdk 33
+        android {
+            namespace 'com.example.upiapp'
+            compileSdk 18
 
-    defaultConfig {
-        applicationId "com.example.upiapp"
-        minSdk 16
-        targetSdk 33
-        versionCode 1
+            defaultConfig {
+                applicationId "com.example.upiapp"
+                minSdk 16
+                targetSdk 18
+                versionCode 1
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
