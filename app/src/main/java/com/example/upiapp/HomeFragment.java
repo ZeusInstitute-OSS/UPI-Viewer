@@ -1,7 +1,7 @@
 package com.example.upiapp;
 
 public class HomeFragment {
-    public ExampleActivity() {
-        super(R.layout.fragment_home);
+    public HomeFragment() {
+        super(R.layout.fragment_home.xml);
 
     }
