@@ -17,7 +17,8 @@
             android:layout_height="244dp"
             tools:layout_editor_absoluteX="155dp"
             tools:layout_editor_absoluteY="39dp"
-            tools:src="@tools:sample/backgrounds/scenic[6]" />
+            tools:src="@tools:sample/backgrounds/scenic[6]"
+            tools:ignore="MissingConstraints" />
 
         <TextView
             android:id="@+id/textView2"
