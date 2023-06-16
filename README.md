@@ -27,7 +27,8 @@ UPI Qr is not mine, all rights to https://upiqr.in/?name=SHAKTI&vpa=SHAKTI.41215
 5. To and Fro UPI Transactions (with Dynamic QR) : ❌
 6. To and Fro Card Transactions (entering card details) : ❌
 7. Basic Addon Framework : ❌
-8. Selecting the right license for the project : ❌
+8. Auto-update using github releases in-app or using obtainium : ❌
+9. Selecting the right license for the project : ❌
 
 ### Electronics Prototype(simple addon framework and app support for it): 
 
