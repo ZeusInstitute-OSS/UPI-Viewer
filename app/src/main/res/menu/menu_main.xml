@@ -6,8 +6,11 @@
         android:enabled="true"
         android:title="Recieve UPI" />
     <item android:title="Recieve Card" />
+    <item android:title="Send UPI" />
+    <item android:title="Send Card" />
     <item android:title="Hardware" ></item>
     <item android:title="Addon Settings" />
+    <item android:title="Change Profile" />
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
