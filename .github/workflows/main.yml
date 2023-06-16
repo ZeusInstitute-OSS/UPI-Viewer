@@ -42,6 +42,6 @@ jobs:
         file: "app/build/outputs/apk/*/*.apk"
         name: ${{ github.run_id }}
         tag_name: ${{ github.run_id }}
-        draft: true
+        draft: false
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
