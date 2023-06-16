@@ -8,7 +8,7 @@ android {
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.example.upiapp"
+        applicationId "com.zeusinstitute.upiapp"
         minSdk 16
         targetSdk 18
         versionCode 1
