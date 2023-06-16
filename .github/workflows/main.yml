@@ -30,11 +30,18 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew assembleDebug
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v2
+      with:
+          name: App-Artifact
+          path: |
+            app/build/outputs/apk/*/*.apk
     - name: Upload to Release
       uses: xresloader/upload-to-github-release@v1
       with:
         file: "app/build/outputs/apk/*/*.apk"
         name: ${{ github.run_id }}
         tag_name: ${{ github.run_id }}
+        draft: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
