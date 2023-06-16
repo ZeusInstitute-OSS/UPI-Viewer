@@ -30,4 +30,4 @@ tools:layout="@layout/activity_main" />
 
        <!-- <action
             android:id="@+id/action_SecondFragment_to_FirstFragment"
-            app:destination="@id/FirstFragment" />-->
+            app:destination="@id/Fir    stFragment" />-->
