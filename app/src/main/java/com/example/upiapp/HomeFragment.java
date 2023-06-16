@@ -5,3 +5,4 @@ public class HomeFragment {
         super(R.layout.fragment_home.xml);
 
     }
+}
