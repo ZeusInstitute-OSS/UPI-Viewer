@@ -26,4 +26,9 @@
                android:id="@+id/action_SecondFragment_to_FirstFragment"
                app:destination="@id/FirstFragment" />
        </fragment>  -->
-   </navigation>
+    <activity
+        android:id="@+id/mainActivity"
+        android:name="com.example.upiapp.MainActivity"
+        android:label="activity_main"
+        tools:layout="@layout/activity_main" />
+</navigation>
