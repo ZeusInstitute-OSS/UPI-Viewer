@@ -29,7 +29,7 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build with Gradle
-      run: ./gradlew build
+      run: ./gradlew assembleDebug
     - name: Upload to Release
       uses: xresloader/upload-to-github-release@v1
       with:
