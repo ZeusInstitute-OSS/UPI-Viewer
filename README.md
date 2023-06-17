@@ -36,3 +36,4 @@ UPI Qr is not mine, all rights to https://upiqr.in/?name=SHAKTI&vpa=SHAKTI.41215
 1. Designing PCBs/Prototype on Breadboard : ❌
 2. Designing a communications system using serial over usb or bluetooth : ❌
 3. Creating app support for communication : ❌
+4. Add QOL features like split the bill and more : ❌
