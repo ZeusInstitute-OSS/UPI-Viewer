@@ -8,6 +8,11 @@
     <item android:title="Recieve Card" />
     <item android:title="Send UPI" />
     <item android:title="Send Card" />
+    <item android:title="More Options" >
+        <menu >
+            <item android:title="Split The Bill" />
+        </menu>
+    </item>
     <item android:title="Hardware" ></item>
     <item android:title="Addon Settings" />
     <item android:title="Change Profile" />
@@ -15,5 +20,9 @@
         android:id="@+id/action_settings"
         android:orderInCategory="100"
         android:title="@string/action_settings"
-        app:showAsAction="never"/>
+        app:showAsAction="never">
+        <menu >
+            <item android:title="Update" />
+        </menu>
+    </item>
 </menu>
