@@ -28,13 +28,13 @@ jobs:
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-    - name: Decode Keystore
-      id: decode_keystore
-      uses: timheuer/base64-to-file@v1.2
-      with:
-        fileName: 'android_keystore.jks'
-        fileDir: app/keystore/
-        encodedString: ${{ secrets.KEYSTORE }}
+    #- name: Decode Keystore
+    #  id: decode_keystore
+    #  uses: timheuer/base64-to-file@v1.2
+    #  with:
+    #    fileName: 'android_keystore.jks'
+    #    fileDir: app/keystore/
+    #    encodedString: ${{ secrets.KEYSTORE }}
     - name: Build with Gradle
       run: ./gradlew assembleRelease
       env:
