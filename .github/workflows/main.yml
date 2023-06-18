@@ -36,7 +36,7 @@ jobs:
     #    fileDir: app/keystore/
     #    encodedString: ${{ secrets.KEYSTORE }}
     - name: Build with Gradle
-      run: ./gradlew assembleRelease #assembleDebug #assembleRelease #--debug
+      run: ./gradlew assembleDebug #assembleDebug #assembleRelease #--debug
       env:
         SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
         SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
@@ -59,9 +59,10 @@ jobs:
     #    keystore_password: ${{ secrets.key_store_password }}
     #    key_alias: ${{ secrets.key_alias }}
     #    key_password: ${{ secrets.key_password }}
-    #- name: Sign Apk
-    #  run: |
-    #    apksigner sign --ks release.jks app.apk
+    - name: Sign Apk
+      run: |
+        jarsigner -keystore app/keystore/android_keystore.jks  -storepass ${{ secrets.key_store_password }} -keypass ${{ secrets.key_password }} app/build/outputs/apk/*/*.apk ${{ secrets.key_alias }}
+     #   apksigner sign --ks release.jks app.apk
     - name: Upload Artifact
       uses: actions/upload-artifact@v2
       with:
