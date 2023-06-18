@@ -5,13 +5,14 @@ plugins {
 //signingConfig signingConfigs.release
 android {
     namespace 'com.example.upiapp'
-    compileSdk 31
+    compileSdk 33
 
 
     defaultConfig {
         applicationId "com.zeusinstitute.upiapp"
         minSdk 16
         targetSdk 18
+        compileSdk 33
         versionCode 1
         versionName "1.0"
         compileSdkVersion = 18
