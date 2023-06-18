@@ -5,7 +5,7 @@ plugins {
 
 android {
     namespace 'com.example.upiapp'
-    compileSdk 33
+    compileSdk 30
 
     defaultConfig {
         applicationId "com.zeusinstitute.upiapp"

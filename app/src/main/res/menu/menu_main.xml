@@ -26,7 +26,6 @@
             <item
                 android:title="Update"
                 tools:context=".UpdateFragment"/>
-                //android:onClick="fragment_update.xml"
             <item android:title="About App" />
         </menu>
     </item>
