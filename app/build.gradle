@@ -11,11 +11,10 @@ android {
     defaultConfig {
         applicationId "com.zeusinstitute.upiapp"
         minSdk 16
-        targetSdk 33
-        compileSdk 33
+        targetSdk 18
         versionCode 1
         versionName "1.0"
-        compileSdkVersion = 18
+        //compileSdkVersion = 18
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
 
