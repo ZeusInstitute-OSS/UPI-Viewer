@@ -26,10 +26,10 @@ jobs:
         git config --global user.email "sounddrill31@gmail.com"
       id: pwd
 
-    #- name: Grant execute permission for gradlew
-    #  run: chmod +x gradlew
-    #- name: Build with Gradle
-    #  run: ./gradlew assembleRelease
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+    - name: Build with Gradle
+      run: ./gradlew assembleRelease
     #- name: Sign apk
     #  uses: r0adkll/sign-android-release@v1
     #  id: sign_app
@@ -41,13 +41,16 @@ jobs:
     #    keyPassword: ${{ secrets.KEY_PASSWORD }}
     #  env:
     #    BUILD_TOOLS_VERSION: "30.0.2"
-    - name: Build Signed APK
-      uses: victorbnl/build-signed-apk@main
-      with:
-        keystore_b64: ${{ secrets.keystore }}
-        keystore_password: ${{ secrets.key_store_password }}
-        key_alias: ${{ secrets.key_alias }}
-        key_password: ${{ secrets.key_password }}
+    #- name: Build Signed APK
+    # uses: victorbnl/build-signed-apk@main
+    #  with:
+    #    keystore_b64: ${{ secrets.keystore }}
+    #    keystore_password: ${{ secrets.key_store_password }}
+    #    key_alias: ${{ secrets.key_alias }}
+    #    key_password: ${{ secrets.key_password }}
+    #- name: Sign Apk
+    #  run: |
+    #    apksigner sign --ks release.jks app.apk
     - name: Upload Artifact
       uses: actions/upload-artifact@v2
       with:
