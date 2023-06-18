@@ -23,7 +23,9 @@
         app:showAsAction="never">
         <menu >
             <item android:title="Log In" />
-            <item android:title="Update" />
+            <item
+                android:title="Update"
+                tools:context=".UpdateFragment"/>
             <item android:title="About App" />
         </menu>
     </item>
