@@ -9,7 +9,7 @@ android {
 
 
     defaultConfig {
-        applicationId "com.zeusinstitute.upiapp"
+        applicationId "com.zeusinstitute.posmachine"
         minSdk 16
         targetSdk 18
         versionCode 1
