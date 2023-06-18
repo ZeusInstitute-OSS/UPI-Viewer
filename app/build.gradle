@@ -21,12 +21,12 @@ android {
             release {
                 minifyEnabled false
                 proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-                signingConfigs {
-                        storeFile = file("/home/runner/work/UPIAPP/UPIAPP/app/keystore/android_keystore.jks")
-                        storePassword System.getenv("SIGNING_STORE_PASSWORD")
-                        keyAlias System.getenv("SIGNING_KEY_ALIAS")
-                        keyPassword System.getenv("SIGNING_KEY_PASSWORD")
-                    }
+                //signingConfigs {
+                //        storeFile = file("/home/runner/work/UPIAPP/UPIAPP/app/keystore/android_keystore.jks")
+                //        storePassword System.getenv("SIGNING_STORE_PASSWORD")
+                //        keyAlias System.getenv("SIGNING_KEY_ALIAS")
+                //        keyPassword System.getenv("SIGNING_KEY_PASSWORD")
+                //    }
             }
         }
         compileOptions {
