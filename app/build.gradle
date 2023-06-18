@@ -14,8 +14,9 @@ android {
         targetSdk 18
         versionCode 1
         versionName "1.0"
-        signingConfig signingConfigs.release
+
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner" }
+    signingConfig signingConfigs.release
         signingConfigs {
             storeFile = file("keystore/android_keystore.jks")
             storePassword System.getenv("SIGNING_STORE_PASSWORD")
