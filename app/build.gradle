@@ -11,7 +11,7 @@ android {
     defaultConfig {
         applicationId "com.zeusinstitute.upiapp"
         minSdk 16
-        targetSdk 18
+        targetSdk 33
         compileSdk 33
         versionCode 1
         versionName "1.0"
