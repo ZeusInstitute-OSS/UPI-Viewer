@@ -30,18 +30,24 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew assembleRelease
-    - name: Sign apk
-      uses: r0adkll/sign-android-release@v1
-      id: sign_app
+    #- name: Sign apk
+    #  uses: r0adkll/sign-android-release@v1
+    #  id: sign_app
+    #  with:
+    #    releaseDirectory: app/build/outputs/apk/release
+    #    signingKeyBase64: ${{ secrets.SIGNINGKEYBASE64 }}
+    #    alias: ${{ secrets.ALIAS }}
+    #    keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+    #    keyPassword: ${{ secrets.KEY_PASSWORD }}
+    #  env:
+    #    BUILD_TOOLS_VERSION: "30.0.2"
+    - name: Build Signed APK
+      uses: victorbnl/build-signed-apk@main
       with:
-        releaseDirectory: app/build/outputs/apk/release
-        signingKeyBase64: ${{ secrets.SIGNINGKEYBASE64 }}
-        alias: ${{ secrets.ALIAS }}
-        keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
-        keyPassword: ${{ secrets.KEY_PASSWORD }}
-      env:
-        BUILD_TOOLS_VERSION: "30.0.2"
-      
+        keystore_b64: ${{ secrets.keystore }}
+        keystore_password: ${{ secrets.key_store_password }}
+        key_alias: ${{ secrets.key_alias }}
+        key_password: ${{ secrets.key_password }}
     - name: Upload Artifact
       uses: actions/upload-artifact@v2
       with:
