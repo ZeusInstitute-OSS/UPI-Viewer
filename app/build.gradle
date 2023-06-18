@@ -15,8 +15,7 @@ android {
         versionCode 1
         versionName "1.0"
         compileSdkVersion = 18
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner" }
-
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
 
         buildTypes {
@@ -41,6 +40,7 @@ android {
             viewBinding true
         }
     }
+}
     signingConfigs {
         release {
             storeFile = file("keystore/android_keystore.jks")
