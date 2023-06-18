@@ -31,7 +31,7 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew assembleDebug
     - name: Sign apk
-      uses: r0adkll/sign-android-release
+      uses: r0adkll/sign-android-release@latest
       id: sign_app
       with:
         releaseDirectory: app/build/outputs/apk/debug
