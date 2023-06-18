@@ -25,7 +25,8 @@
             <item android:title="Log In" />
             <item
                 android:title="Update"
-                tools:context=".UpdateFragment"/>
+                tools:context=".UpdateFragment"
+                android:onClick="fragment_update.xml"/>
             <item android:title="About App" />
         </menu>
     </item>
