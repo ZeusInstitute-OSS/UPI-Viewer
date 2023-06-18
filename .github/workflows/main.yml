@@ -32,12 +32,12 @@ jobs:
       run: ./gradlew assembleRelease
     - name: Sign apk
       uses: r0adkll/sign-android-release@v1
-      id: 1111556255
+      id: test
       with:
         releaseDirectory: app/build/outputs/apk/release
         signingKeyBase64: ${{ secrets.SIGNINGKEYBASE64 }}
         alias: ${{ secrets.ALIAS }}
-        keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+        keyStorePassword: ${{ secrets.KEYSTOREPASSWORD}}
         keyPassword: ${{ secrets.KEY_PASSWORD }}
       env:
         BUILD_TOOLS_VERSION: "30.0.2"
