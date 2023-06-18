@@ -15,7 +15,7 @@ dependencyResolutionManagement {
 rootProject.name = "UPIAPP"
 include ':app'
 
-    signingConfigs {
+    signingConfig {
         release {
             storeFile = file("keystore/android_keystore.jks")
             storePassword System.getenv("SIGNING_STORE_PASSWORD")
