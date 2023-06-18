@@ -14,14 +14,6 @@ dependencyResolutionManagement {
 }
 rootProject.name = "UPIAPP"
 include ':app'
-android {
-    // ...
-
-    defaultConfig {
-        // ...
-        versionName "1.1"
-        // ...
-    }
 
     signingConfigs {
         release {
@@ -32,16 +24,3 @@ android {
         }
     }
 
-    buildTypes {
-        // ...
-        release {
-            // ...
-            applicationVariants.all { variant ->
-                variant.outputs.all {
-                    outputFileName = "${rootProject.name}_${versionName}.apk"
-                }
-            }
-            signingConfig signingConfigs.release
-        }
-    }
-}
