@@ -14,4 +14,3 @@ dependencyResolutionManagement {
 }
 rootProject.name = "UPIAPP"
 include ':app'
-compileSdkVersion = '18'

@@ -14,7 +14,7 @@ android {
         targetSdk 18
         versionCode 1
         versionName "1.0"
-
+        compileSdkVersion = 18
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner" }
 
         signingConfigs {
