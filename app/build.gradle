@@ -14,7 +14,7 @@ android {
         targetSdk 18
         versionCode 1
         versionName "1.0"
-
+        signingConfig signingConfigs.release
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner" }
         signingConfigs {
             storeFile = file("keystore/android_keystore.jks")
@@ -33,7 +33,7 @@ android {
                     }
             }
         }
-                signingConfig signingConfigs.release
+
         compileOptions {
             sourceCompatibility JavaVersion.VERSION_1_8
             targetCompatibility JavaVersion.VERSION_1_8
