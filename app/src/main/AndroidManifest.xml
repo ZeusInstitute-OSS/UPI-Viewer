@@ -12,7 +12,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.UPIAPP"
         android:testOnly="false"
-        android:debuggable="true"
         tools:targetApi="18">
         <activity
             android:name=".MainActivity"
