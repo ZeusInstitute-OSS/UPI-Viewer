@@ -61,7 +61,7 @@ jobs:
     #    key_password: ${{ secrets.key_password }}
     - name: Sign Apk
       run: |
-        jarsigner -keystore app/keystore/android_keystore.jks  -storepass ${{ secrets.key_store_password }} -keypass ${{ secrets.key_password }} app/build/outputs/apk/*/*.apk ${{ secrets.key_alias }}
+        jarsigner -keystore app/keystore/android_keystore.jks  -storepass ${{ secrets.key_store_password }} -keypass ${{ secrets.key_password }} app/build/outputs/apk/*/*.apk key0
      #   apksigner sign --ks release.jks app.apk
     - name: Upload Artifact
       uses: actions/upload-artifact@v2
