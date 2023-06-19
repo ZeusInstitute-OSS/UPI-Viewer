@@ -28,6 +28,7 @@
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="@dimen/fab_margin"
         android:layout_marginBottom="16dp"
-        app:srcCompat="@drawable/baseline_supervised_user_circle_24" />
+        app:srcCompat="@drawable/baseline_supervised_user_circle_24"
+        android:contentDescription="Profile Mode is WIP!" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
