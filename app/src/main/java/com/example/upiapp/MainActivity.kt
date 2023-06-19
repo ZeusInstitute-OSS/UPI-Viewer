@@ -10,6 +10,7 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import android.view.Menu
 import android.view.MenuItem
+import androidx.navigation.Navigation
 import androidx.navigation.fragment.NavHostFragment
 import com.example.upiapp.databinding.ActivityMainBinding
 import androidx.navigation.fragment.findNavController
@@ -21,7 +22,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         super.onCreate(savedInstanceState)
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
+        val navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main)
 
         //val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment
         // Passing each menu ID as a set of Ids because each
@@ -64,7 +65,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onSupportNavigateUp(): Boolean {
         //val navHostFragment = supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_main) as NavHostFragment
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
+        val navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main)
        // val navController = navHostFragment.navController
         return navController.navigateUp(appBarConfiguration)
                 || super.onSupportNavigateUp()
