@@ -64,4 +64,5 @@
     <string name="login">Log In</string>
     <string name="loginname">Log In To Paytm API</string>
     <string name="login1">Log In Using Paytm API Keys</string>
+    <string name="backlogin">Go Back</string>
 </resources>

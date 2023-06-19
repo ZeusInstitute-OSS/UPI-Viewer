@@ -14,10 +14,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.UPIAPP"
         tools:targetApi="18">
+
         <activity
-            android:name=".login"
-            android:exported="false" />
-        <activity
+
             android:name=".MainActivity"
             android:exported="true"
             android:label="@string/app_name"
@@ -27,6 +26,14 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".Login"
+            android:exported="true"
+            android:parentActivityName=".MainActivity">
+        <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value=".MainActivity" />
         </activity>
     </application>
 
