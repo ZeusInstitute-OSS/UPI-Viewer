@@ -1,11 +1,10 @@
 package com.example.upiapp
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-//import androidx.navigation.fragment.findNavController
+import androidx.fragment.app.Fragment
 import com.example.upiapp.databinding.FragmentFirstBinding
 
 /**
@@ -20,8 +19,8 @@ class FirstFragment : Fragment() {
     private val binding get() = _binding!!
 
     override fun onCreateView(
-            inflater: LayoutInflater, container: ViewGroup?,
-            savedInstanceState: Bundle?
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
     ): View? {
 
         _binding = FragmentFirstBinding.inflate(inflater, container, false)
@@ -29,11 +28,7 @@ class FirstFragment : Fragment() {
 
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
 
-
-    }
 
     override fun onDestroyView() {
         super.onDestroyView()
