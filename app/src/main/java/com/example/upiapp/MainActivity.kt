@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
 
         binding.fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+            Snackbar.make(view, "Profile Mode is WIP!", Snackbar.LENGTH_LONG)
                     .setAnchorView(R.id.fab)
                     .setAction("Action", null).show()
         }
