@@ -20,20 +20,4 @@
         app:layout_constraintVertical_bias="1.0"
         app:navGraph="@navigation/nav_graph" />
 
-    <ImageView
-        android:id="@+id/imageView2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:layout_editor_absoluteX="159dp"
-        tools:layout_editor_absoluteY="162dp"
-        tools:srcCompat="@tools:sample/avatars[0]" />
-
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="1234567890@zeusinstitute"
-        tools:layout_editor_absoluteX="137dp"
-        tools:layout_editor_absoluteY="335dp" />
-
 </androidx.constraintlayout.widget.ConstraintLayout>
