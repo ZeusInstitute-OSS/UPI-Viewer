@@ -58,5 +58,5 @@
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
     <string name="image3">dummy image for upi placeholder\n</string>
-    <string name="dummyupi">1234567890@zeusinstitute</string>
+    <string name="dummyupi">dummy upi id for placeholder</string>
 </resources>
