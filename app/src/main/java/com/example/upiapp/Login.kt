@@ -8,6 +8,6 @@ class Login : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
-        val actionBar: ActionBar? = actionBar
+        //val actionBar: ActionBar? = actionBar
         setSupportActionBar(findViewById(R.id.toolbar2))
 }
