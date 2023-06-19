@@ -10,4 +10,5 @@ class Login : AppCompatActivity() {
         setContentView(R.layout.activity_login)
         //val actionBar: ActionBar? = actionBar
         setSupportActionBar(findViewById(R.id.toolbar2))
+    }
 }
