@@ -37,7 +37,7 @@ jobs:
     #    encodedString: ${{ secrets.KEYSTORE }}
     - name: Build with Gradle
       run: ./gradlew assembleDebug #assembleDebug #assembleRelease #--debug
-      env:
+      #env:
         #SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
         #SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
         #SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
