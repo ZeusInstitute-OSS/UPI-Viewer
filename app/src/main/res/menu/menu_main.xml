@@ -22,7 +22,9 @@
         android:title="@string/action_settings"
         app:showAsAction="never">
         <menu >
-            <item android:title="Log In" />
+            <item
+                android:id="@+id/log_in"
+                android:title="@string/login"/>
             <item android:title="Update" />
             <item android:title="About App" />
         </menu>
