@@ -50,9 +50,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:clickable="true"
+        android:hint="Back Button to Main Screen"
         android:src="@drawable/back_foreground"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:hint="Back Button to Main Screen"/>
+        android:contentDescription="Back Button to Main Screen" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
