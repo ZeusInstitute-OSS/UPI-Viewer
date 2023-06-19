@@ -27,6 +27,7 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:src="@tools:sample/backgrounds/scenic[2]"
             tools:visibility="visible"
+            
             android:contentDescription="@string/image3" />
 
         <TextView
