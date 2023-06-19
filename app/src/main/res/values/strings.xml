@@ -57,6 +57,6 @@
     <string name="attachment_summary_on">Automatically download attachments for incoming emails
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
-    <string name="image3">Dummy Stock Image For testing</string>
-    <string name="dummyupi">1234567890@zeus</string>
+    <string name="image3">dummy image for upi placeholder\n</string>
+    <string name="dummyupi">dummy upi id for placeholder</string>
 </resources>
