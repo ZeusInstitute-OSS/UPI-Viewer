@@ -25,21 +25,21 @@ jobs:
         git config --global user.name "sounddrill31"
         git config --global user.email "sounddrill31@gmail.com"
       id: pwd
-   # - name: Grant execute permission for gradlew
-    #  run: chmod +x gradlew
-   # - name: Build with Gradle
-    #  run: ./gradlew assembleDebug
-    - name: Build with FastLane
-      run: |
-        sudo apt update
-        sudo apt install gnupg2 -y
-        sudo chmod +rwx /var/lib/gems/ --recursive
-        sudo chmod +rwx /home/runner/work/untitled-upi-for-android-4/untitled-upi-for-android-4 --recursive
-        sudo chown -R $USER /var/lib/gems/
-        sudo chown -R $USER /home/runner/work/untitled-upi-for-android-4/untitled-upi-for-android-4
-         gem install bundler 
-        bundle update
-        bundle exec fastlane beta
+    - name: Grant execute permission for gradlew
+      run: chmod +x gradlew
+    - name: Build with Gradle
+      run: ./gradlew assembleDebug
+   # - name: Build with FastLane
+   #   run: |
+   #     sudo apt update
+   #     sudo apt install gnupg2 -y
+   #     sudo chmod +rwx /var/lib/gems/ --recursive
+   #     sudo chmod +rwx /home/runner/work/untitled-upi-for-android-4/untitled-upi-for-android-4 --recursive
+   #     sudo chown -R $USER /var/lib/gems/
+   #     sudo chown -R $USER /home/runner/work/untitled-upi-for-android-4/untitled-upi-for-android-4
+   #      gem install bundler
+   #     bundle update
+   #     bundle exec fastlane beta
      #   fastlane beta
 
    # - name: Sign apk
