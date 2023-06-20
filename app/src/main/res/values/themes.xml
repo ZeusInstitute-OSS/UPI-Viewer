@@ -6,4 +6,10 @@
     </style>
 
     <style name="Theme.UPIAPP" parent="Base.Theme.UPIAPP" />
+    <style name="Theme.UPIAPP.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+    <style name="Theme.UPIAPP.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="Theme.UPIAPP.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 </resources>
