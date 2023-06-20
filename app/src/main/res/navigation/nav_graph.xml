@@ -5,6 +5,7 @@
     android:id="@+id/nav_graph"
     app:startDestination="@id/FirstFragment">
 
+
        <fragment
            android:id="@+id/FirstFragment"
            android:name="com.example.upiapp.FirstFragment"
@@ -16,18 +17,16 @@ android:id="@+id/mainActivity"
 android:name="com.example.upiapp.MainActivity"
 android:label="activity_main"
 tools:layout="@layout/activity_main" />
-</navigation>
-
-    <!-- <action
-               android:id="@+id/action_FirstFragment_to_SecondFragment"
-               app:destination="@id/SecondFragment" />
-       </fragment>
        <fragment
-           android:id="@+id/SecondFragment"
-           android:name="com.example.upiapp.SecondFragment"
-           android:label="@string/second_fragment_label"
-           tools:layout="@layout/fragment_second">-->
+           android:id="@+id/loginFragment"
+           android:name="com.example.upiapp.ui.login.LoginFragment"
+           android:label="fragment_login2"
+           tools:layout="@layout/fragment_login2">
+              <action
+                  android:id="@+id/action_loginFragment_to_mainActivity"
+                  app:destination="@id/mainActivity"
+                  app:popUpTo="@id/FirstFragment" />
+       </fragment>
 
-       <!-- <action
-            android:id="@+id/action_SecondFragment_to_FirstFragment"
-            app:destination="@id/Fir    stFragment" />-->
+
+</navigation>

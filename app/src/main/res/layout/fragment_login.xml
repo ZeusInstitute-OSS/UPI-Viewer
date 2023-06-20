@@ -7,19 +7,6 @@
     tools:context=".Login">
 
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbar2"
-        android:name="@string/login1"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:background="?attr/colorPrimary"
-        android:minHeight="?attr/actionBarSize"
-        android:theme="?attr/actionBarTheme"
-        app:buttonGravity="top"
-        app:layout_constraintTop_toTopOf="parent"
-        app:navigationIcon="?homeAsUpIndicator"
-        tools:layout_editor_absoluteX="0dp" />
-
     <EditText
         android:id="@+id/apikey"
         android:layout_width="wrap_content"
@@ -50,10 +37,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:clickable="true"
+        android:contentDescription="Back Button to Main Screen"
         android:hint="Back Button to Main Screen"
+        android:onClick="goBack"
         android:src="@drawable/back_foreground"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:contentDescription="Back Button to Main Screen" />
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
