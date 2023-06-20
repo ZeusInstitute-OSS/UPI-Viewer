@@ -34,13 +34,9 @@ jobs:
         sudo apt update
         sudo apt install gnupg2 -y
              sudo chmod +rwx /var/lib/gems/ --recursive
-         gem install bundler #  --user-install
+         gem install bundler 
         bundle update # --user-install
-             sudo chmod +rwx /var/lib/gems/*
 
-        gem install bundler 
-        bundle update 
-        fastlane beta
    # - name: Sign apk
    #   uses: r0adkll/sign-android-release@v1
    #   id: sign_app
