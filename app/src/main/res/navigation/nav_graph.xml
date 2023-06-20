@@ -18,14 +18,14 @@ android:name="com.example.upiapp.MainActivity"
 android:label="activity_main"
 tools:layout="@layout/activity_main" />
        <fragment
-           android:id="@+id/loginFragment"
-           android:name="com.example.upiapp.ui.login.LoginFragment"
-           android:label="fragment_login2"
-           tools:layout="@layout/fragment_login2">
+           android:id="@+id/login"
+           android:name="com.example.upiapp.Login"
+           android:label="fragment_login"
+           tools:layout="@layout/fragment_login" >
               <action
-                  android:id="@+id/action_loginFragment_to_mainActivity"
+                  android:id="@+id/action_login_to_mainActivity"
                   app:destination="@id/mainActivity"
-                  app:popUpTo="@id/FirstFragment" />
+                  app:popUpTo="@id/mainActivity" />
        </fragment>
 
 

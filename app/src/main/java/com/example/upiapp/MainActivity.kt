@@ -67,7 +67,7 @@ class MainActivity : AppCompatActivity() {
         // Handle item selection
         return when (item.itemId) {
             R.id.log_in -> {
-                setContentView(R.layout.fragment_login2)
+                setContentView(R.layout.fragment_login)
                 true
             }
             R.id.floatingActionButton -> {

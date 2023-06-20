@@ -4,10 +4,14 @@ package com.example.upiapp
 
 
 import android.app.PendingIntent.getActivity
+import android.content.Intent
 import android.os.Bundle
 import android.view.KeyEvent
-import android.view.MenuItem
+import android.view.View
+import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import com.example.upiapp.databinding.FragmentLoginBinding
 
 
@@ -16,44 +20,37 @@ private lateinit var binding: FragmentLoginBinding
 //private lateinit var binding: ActivityLoginBinding
 
 
-class Login : AppCompatActivity() {
-            override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        //setContentView(R.layout.activity_login)
-        //setContentView(R.layout.activity_login)
-        //custom code
-
-        setContentView(R.layout.fragment_login)
-        val actionbar = supportActionBar
-        actionbar!!.title = resources.getString(R.string.app_name)
-        actionbar.setDisplayHomeAsUpEnabled(true)
-    }
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.log_in -> {
-                setContentView(R.layout.fragment_login)
-                true
-            }
-            R.id.floatingActionButton -> {
-                androidx.appcompat.R.id.home
-                //setContentView(R.layout.activity_main)
-                true
-            }
-            android.R.id.home -> {
-                supportFragmentManager.popBackStack()
-                return true
-            }
-
-            else -> super.onOptionsItemSelected(item)
+class Login : Fragment() {
+    @Override
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        onViewCreated(view, savedInstanceState)
+        // Access the views here
+        val button = view.findViewById<Button>(R.id.floatingActionButton)
+        button.setOnClickListener {
+            // Do something when button is clicked
+            activity?.setContentView(R.layout.activity_main)
         }
     }
-    override fun onSupportNavigateUp(): Boolean {
-        dispatchKeyEvent(KeyEvent(KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_BACK))
-        dispatchKeyEvent(KeyEvent(KeyEvent.ACTION_UP, KeyEvent.KEYCODE_BACK))
-        //onBackPressed()
-        return super.onSupportNavigateUp()
-        finish()
+
     }
+
+      //      override fun onCreate(savedInstanceState: Bundle?) {
+       //         super.onCreate(savedInstanceState)
+                //setContentView(R.layout.activity_login)
+                //setContentView(R.layout.activity_login)
+                //custom code
+
+                //setContentView(R.layout.fragment_login)
+                //       val button = findViewById<Button>(R.id.floatingActionButton)
+                //       button.setOnClickListener {
+                //           setContentView(R.layout.fragment_first)
+                //       }
+
+         //       }
+
+      //      }
+//
+
 
 
 
@@ -61,7 +58,7 @@ class Login : AppCompatActivity() {
     // }
 
 
-}
+
 
 
 
