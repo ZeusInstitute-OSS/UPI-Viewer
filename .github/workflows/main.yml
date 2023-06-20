@@ -37,7 +37,8 @@ jobs:
         sudo chown -R $USER /var/lib/gems/
          gem install bundler 
         bundle update # --user-install
-        fastlane beta
+        bundle exec fastlane beta
+     #   fastlane beta
 
    # - name: Sign apk
    #   uses: r0adkll/sign-android-release@v1
