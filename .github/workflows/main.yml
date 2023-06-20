@@ -25,11 +25,16 @@ jobs:
         git config --global user.name "sounddrill31"
         git config --global user.email "sounddrill31@gmail.com"
       id: pwd
+   # - name: Grant execute permission for gradlew
+    #  run: chmod +x gradlew
+   # - name: Build with Gradle
+    #  run: ./gradlew assembleDebug
     - name: Build with FastLane
       run: |
         sudo apt update
-        sudo apt install gnupg2 -y 
-        sudo chmod -R 777 /home/runner/.local/share/gem/ruby/3.0.0/bin 
+        sudo apt install gnupg2 -y
+             sudo chmod +rwx /home/runner/.local/share/gem/ruby/
+ #       sudo chmod --recursive 777 /home/runner/.local/share/gem/ruby/3.0.0/bin
       #  gpg2 --list-keys
       #  gpg2 --keyserver keyserver.ubuntu.com --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
       #  #\curl -sSL https://get.rvm.io | bash -s stable
