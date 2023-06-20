@@ -33,7 +33,8 @@ jobs:
       run: |
         sudo apt update
         sudo apt install gnupg2 -y
-             sudo chmod +rwx /var/lib/gems/ --recursive
+        sudo chmod +rwx /var/lib/gems/ --recursive
+        sudo chmod +rwx /home/runner/work/untitled-upi-for-android-4/untitled-upi-for-android-4 --recursive
         sudo chown -R $USER /var/lib/gems/
         sudo chown -R $USER /home/runner/work/untitled-upi-for-android-4/untitled-upi-for-android-4
          gem install bundler 
