@@ -33,6 +33,7 @@ jobs:
     - name: Build with FastLane
       run: |
         sudo apt update
+        sudo apt install gnupg2 
         \curl -sSL https://get.rvm.io | bash -s stable
         gem install bundler
         bundle install
