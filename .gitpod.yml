@@ -5,7 +5,8 @@
 # Learn more from ready-to-use templates: https://www.gitpod.io/docs/introduction/getting-started/quickstart
 
 tasks:
-  - init: bundle install
+  - init: gem install bundler
+  - run: bundle install
   - run: fastlane beta
 
 
