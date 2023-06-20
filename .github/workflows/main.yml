@@ -25,7 +25,6 @@ jobs:
         git config --global user.name "sounddrill31"
         git config --global user.email "sounddrill31@gmail.com"
       id: pwd
-
    # - name: Grant execute permission for gradlew
     #  run: chmod +x gradlew
    # - name: Build with Gradle
@@ -41,9 +40,7 @@ jobs:
       #  #source /home/runner/.rvm/scripts/rvm
         gem install bundler #  --user-install
         bundle update # --user-install
-        fastlane beta 
-    
-
+        fastlane beta
    # - name: Sign apk
    #   uses: r0adkll/sign-android-release@v1
    #   id: sign_app
