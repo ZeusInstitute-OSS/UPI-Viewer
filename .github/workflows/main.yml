@@ -5,7 +5,7 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-  workflow_dispatch: 
+  workflow_dispatch:
     description: Run it
 jobs:
   build:
@@ -34,7 +34,7 @@ jobs:
         sudo apt update
         sudo apt install gnupg2 -y
              sudo chmod +rwx /var/lib/gems/ --recursive
-        gem install bundler
+         gem install bundler #  --user-install
         bundle update # --user-install
              sudo chmod +rwx /home/runner/.local/share/gem/ruby/
 
@@ -52,7 +52,7 @@ jobs:
    #     keyPassword: ${{ secrets.KEY_PASSWORD }}
    #   env:
    #     BUILD_TOOLS_VERSION: "33.0.2"
-      
+
     - name: Upload Artifact
       uses: actions/upload-artifact@v2
       with:
