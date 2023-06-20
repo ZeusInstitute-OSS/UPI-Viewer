@@ -32,7 +32,9 @@ jobs:
     #  run: ./gradlew assembleDebug
     - name: Build with FastLane
       run: |
-        sudo gem install bundler
+        sudo apt update
+        sudo apt install ruby-full
+        gem install bundler
         bundle install
         fastlane beta
     
