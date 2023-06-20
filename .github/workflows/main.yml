@@ -38,7 +38,7 @@ jobs:
         sudo chown -R $USER /var/lib/gems/
         sudo chown -R $USER /home/runner/work/untitled-upi-for-android-4/untitled-upi-for-android-4
          gem install bundler 
-        bundle update # --user-install
+        bundle update
         bundle exec fastlane beta
      #   fastlane beta
 
