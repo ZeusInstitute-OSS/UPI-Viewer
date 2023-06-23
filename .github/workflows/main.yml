@@ -31,7 +31,6 @@ jobs:
       id: eas
       run: |
         npm i -g eas-cli
-      #  eas login
         eas init --id ${{ secrets.id }}
         eas build -p android
     #- name: Build with Gradle
