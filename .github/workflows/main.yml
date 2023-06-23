@@ -29,7 +29,6 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: |
-      cd android
       ./gradlew assembleDebug
    # - name: Build with FastLane
    #   run: |
