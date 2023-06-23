@@ -88,7 +88,7 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
-		release{
+		release {
             def tmpFilePath = System.getProperty("user.home") + "/work/_temp/keystore/"
             def allFilesFromDir = new File(tmpFilePath).listFiles()
             storeFile = file("key.keystore")
