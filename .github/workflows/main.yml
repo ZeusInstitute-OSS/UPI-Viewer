@@ -19,7 +19,7 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
-        #cache: gradle
+        cache: gradle
     - name: Initialize repo
       run: |
         git config --global user.name "sounddrill31"
@@ -28,8 +28,7 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build with Gradle
-      run: |
-      ./gradlew assembleDebug
+      run: cd android && ./gradlew assembleDebug #assembleDebug assembleRelease
    # - name: Build with FastLane
    #   run: |
     #    sudo gem install fastlane
