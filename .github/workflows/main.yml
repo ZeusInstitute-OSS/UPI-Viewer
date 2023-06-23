@@ -8,8 +8,8 @@ on:
   workflow_dispatch:
     description: Run it
 jobs:
-  build:
-
+  job1:
+    name: Build for Android
     runs-on: ubuntu-latest
 
     steps:
@@ -27,8 +27,12 @@ jobs:
       id: pwd
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
-    - name: Build with Gradle
-      run: ./gradlew assembleDebug #assembleDebug assembleRelease
+    - name: Build using EAS-CLI
+      run: |
+        npm i -g eas-cli
+        eas build -p android
+    #- name: Build with Gradle
+      #run: ./gradlew assembleDebug #assembleDebug assembleRelease
    # - name: Build with FastLane
    #   run: |
     #    sudo gem install fastlane
@@ -74,3 +78,6 @@ jobs:
         draft: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #job2:
+  #  - name: Build for IOS
+
