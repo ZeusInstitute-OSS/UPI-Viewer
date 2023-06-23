@@ -19,7 +19,7 @@ jobs:
       with:
         java-version: '17'
         distribution: 'temurin'
-        cache: gradle
+        #cache: gradle
     - name: Initialize repo
       run: |
         git config --global user.name "sounddrill31"
