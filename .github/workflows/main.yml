@@ -25,8 +25,8 @@ jobs:
         git config --global user.name "sounddrill31"
         git config --global user.email "sounddrill31@gmail.com"
       id: pwd
-    - name: Grant execute permission for gradlew
-      run: chmod +x gradlew
+    #- name: Grant execute permission for gradlew
+    #  run: chmod +x gradlew
     - name: Build using EAS-CLI
       run: |
         npm i -g eas-cli
