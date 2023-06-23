@@ -29,12 +29,7 @@ jobs:
           cd android && chmod +x gradlew
           npm install --legacy-peer-deps
       - name: Build with Gradle
-        run: ./gradlew assembleDebug #assembleDebug assembleRelease
-        #id: test
-        #env:
-        #  SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
-        #  SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
-        #  SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
+        run: ./android/gradlew assembleDebug #assembleDebug assembleRelease
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
