@@ -69,8 +69,8 @@ jobs:
         file: |
           app/build/outputs/apk/*/*.apk
       #    ${{steps.sign_app.outputs.signedReleaseFile}}
-        name: ${{ github.GITHUB_BASE_REF }} ${{ github.run_id }}
-        tag_name: ${{ github.run_id }}
+        name: ${{ github.pull_request_target }} ${{ github.GITHUB_BASE_REF }} ${{ github.run_id }}
+        tag_name: ${{ github.run_id }} ${{ github.pull_request_target }}
         draft: false
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
