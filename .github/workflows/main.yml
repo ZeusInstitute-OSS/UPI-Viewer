@@ -30,38 +30,11 @@ jobs:
           npm install --legacy-peer-deps && cd android 
       - name: Build with Gradle
         run: ./gradlew assembleDebug #assembleDebug assembleRelease
-      id: test
-      env:
+        id: test
+        env:
           SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
           SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
           SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
-   # - name: Build with FastLane
-   #   run: |
-    #    sudo gem install fastlane
-    #    bundle exec fastlane beta
-   #     sudo apt update
-   #     sudo apt install gnupg2 -y
-   #     sudo chmod +rwx /var/lib/gems/ --recursive
-   #     sudo chmod +rwx /home/runner/work/untitled-upi-for-android-4/untitled-upi-for-android-4 --recursive
-   #     sudo chown -R $USER /var/lib/gems/
-   #     sudo chown -R $USER /home/runner/work/untitled-upi-for-android-4/untitled-upi-for-android-4
-   #      gem install bundler
-   #     bundle update
-      #  bundle exec fastlane beta
-     #   fastlane beta
-
-   # - name: Sign apk
-   #   uses: r0adkll/sign-android-release@v1
-   #   id: sign_app
-   #   with:
-   #     releaseDirectory: app/build/outputs/apk/debug
-   #     signingKeyBase64: ${{ secrets.SIGNING_KEY }}
-   #     alias: ${{ secrets.ALIAS }}
-   #     keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
-   #     keyPassword: ${{ secrets.KEY_PASSWORD }}
-   #   env:
-   #     BUILD_TOOLS_VERSION: "33.0.2"
-
       - name: Upload Artifact
         uses: actions/upload-artifact@v2
         with:
