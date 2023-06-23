@@ -10,7 +10,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "react": "18.2.0",
+    "react": "16.8.6",
     "react-native": "0.60.0"
   },
   "devDependencies": {
