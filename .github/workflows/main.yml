@@ -32,7 +32,7 @@ jobs:
       run: |
         npm install --legacy-peer-deps
         cd android 
-        ./gradlew assembleDebug #assembleDebug assembleRelease
+        ./gradlew assembleDebug
       id: test
      env:
           SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
