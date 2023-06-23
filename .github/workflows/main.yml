@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     description: Run it
 jobs:
-  job1:
+    job1:
     name: Build for Android
     runs-on: ubuntu-latest
     steps:
