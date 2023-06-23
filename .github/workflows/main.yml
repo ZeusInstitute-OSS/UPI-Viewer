@@ -29,6 +29,10 @@ jobs:
       run: cd android && chmod +x gradlew
     - name: Build with Gradle
       run: npm install && cd android && ./gradlew assembleDebug #assembleDebug assembleRelease
+      env:
+          SIGNING_KEY_ALIAS: ${{ secrets.SIGNING_KEY_ALIAS }}
+          SIGNING_KEY_PASSWORD: ${{ secrets.SIGNING_KEY_PASSWORD }}
+          SIGNING_STORE_PASSWORD: ${{ secrets.SIGNING_STORE_PASSWORD }}
    # - name: Build with FastLane
    #   run: |
     #    sudo gem install fastlane
