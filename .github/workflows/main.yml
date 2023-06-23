@@ -30,7 +30,7 @@ jobs:
     - name: Build with Gradle
       run: |
       cd android
-      ./gradlew assembleDebug #assembleDebug assembleRelease
+      ./gradlew assembleDebug # assembleDebug # assembleRelease
    # - name: Build with FastLane
    #   run: |
     #    sudo gem install fastlane
