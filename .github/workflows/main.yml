@@ -31,7 +31,7 @@ jobs:
       id: eas
       run: |
         npm i -g eas-cli
-        eas init --id ${{ secrets.id }}
+        eas init --id ${{ secrets.ID }}
         eas build -p android
     #- name: Build with Gradle
       #run: ./gradlew assembleDebug #assembleDebug assembleRelease
