@@ -30,6 +30,7 @@ jobs:
     - name: Build using EAS-CLI
       run: |
         npm i -g eas-cli
+        eas login
         eas build -p android
     #- name: Build with Gradle
       #run: ./gradlew assembleDebug #assembleDebug assembleRelease
