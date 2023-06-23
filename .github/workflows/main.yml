@@ -2,9 +2,9 @@ name: Android CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "kotlin" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "kotlin" ]
   workflow_dispatch:
     description: Run it
 jobs:
