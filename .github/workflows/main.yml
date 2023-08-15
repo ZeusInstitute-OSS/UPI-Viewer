@@ -28,7 +28,8 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build with Gradle
-      run: ./gradlew assembleDebug
+      run: ./gradlew assembleRelease
+      #run: ./gradlew assembleDebug
    # - name: Build with FastLane
    #   run: |
     #    sudo gem install fastlane
@@ -44,17 +45,17 @@ jobs:
       #  bundle exec fastlane beta
      #   fastlane beta
 
-   # - name: Sign apk
-   #   uses: r0adkll/sign-android-release@v1
-   #   id: sign_app
-   #   with:
-   #     releaseDirectory: app/build/outputs/apk/debug
-   #     signingKeyBase64: ${{ secrets.SIGNING_KEY }}
-   #     alias: ${{ secrets.ALIAS }}
-   #     keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
-   #     keyPassword: ${{ secrets.KEY_PASSWORD }}
-   #   env:
-   #     BUILD_TOOLS_VERSION: "33.0.2"
+    - name: Sign apk
+      uses: r0adkll/sign-android-release@v1
+      id: sign_app
+      with:
+        releaseDirectory: app/build/outputs/apk/debug
+        signingKeyBase64: ${{ secrets.SIGNINGKEYBASE64 }}
+        alias: ${{ secrets.ALIAS }}
+        keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+        keyPassword: ${{ secrets.KEY_PASSWORD }}
+      env:
+        BUILD_TOOLS_VERSION: "33.0.2"
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v2
@@ -62,13 +63,13 @@ jobs:
           name: App-Artifact
           path: |
             app/build/outputs/apk/*/*.apk
-     #       ${{steps.sign_app.outputs.signedReleaseFile}}
+            ${{steps.sign_app.outputs.signedReleaseFile}}
     - name: Upload to Release
       uses: xresloader/upload-to-github-release@v1
       with:
         file: |
           app/build/outputs/apk/*/*.apk
-      #    ${{steps.sign_app.outputs.signedReleaseFile}}
+          ${{steps.sign_app.outputs.signedReleaseFile}}
         name: ${{ github.pull_request_target }} ${{ github.GITHUB_BASE_REF }} ${{ github.run_id }}
         tag_name: ${{ github.run_id }} ${{ github.pull_request_target }}
         draft: false
