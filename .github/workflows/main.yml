@@ -2,9 +2,9 @@ name: Android CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "react" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "react" ]
   workflow_dispatch:
     description: Run it
 jobs:
@@ -30,24 +30,33 @@ jobs:
           npm install --legacy-peer-deps
       - name: Build with Gradle
         run: cd android && ./gradlew assembleDebug #assembleDebug assembleRelease
-      - name: Upload Artifact
-        uses: actions/upload-artifact@v2
-        with:
-            name: App-Artifact
-            path: |
-              app/build/outputs/apk/*/*.apk
-     #       ${{steps.sign_app.outputs.signedReleaseFile}}
-      - name: Upload to Release
-        uses: xresloader/upload-to-github-release@v1
-        with:
-          file: |
-            app/build/outputs/apk/*/*.apk
-      #    ${{steps.sign_app.outputs.signedReleaseFile}}
-          name: ${{ github.run_id }}
-          tag_name: ${{ github.run_id }}
-          draft: true
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #job2:
-  #  - name: Build for IOS
+          - name: Sign apk
+      uses: r0adkll/sign-android-release@v1
+      id: sign_app
+      with:
+        releaseDirectory: app/build/outputs/apk/debug
+        signingKeyBase64: ${{ secrets.SIGNINGKEYBASE64 }}
+        alias: ${{ secrets.ALIAS }}
+        keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+        keyPassword: ${{ secrets.KEY_PASSWORD }}
+      #env:
+        #BUILD_TOOLS_VERSION: "33.0.2"
 
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v2
+      with:
+          name: App-Artifact
+          path: |
+            app/build/outputs/apk/*/*.apk
+          #  ${{steps.sign_app.outputs.signedReleaseFile}}
+    - name: Upload to Release
+      uses: xresloader/upload-to-github-release@v1
+      with:
+        file: |
+          app/build/outputs/apk/*/*.apk
+        #  ${{steps.sign_app.outputs.signedReleaseFile}}
+        name: ${{ github.pull_request_target }} ${{ github.GITHUB_BASE_REF }} ${{ github.run_id }}
+        tag_name: ${{ github.run_id }} ${{ github.pull_request_target }}
+        draft: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
