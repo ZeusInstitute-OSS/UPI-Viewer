@@ -64,13 +64,13 @@ jobs:
           name: App-Artifact
           path: |
             app/build/outputs/apk/*/*.apk
-            ${{steps.sign_app.outputs.signedReleaseFile}}
+          #  ${{steps.sign_app.outputs.signedReleaseFile}}
     - name: Upload to Release
       uses: xresloader/upload-to-github-release@v1
       with:
         file: |
           app/build/outputs/apk/*/*.apk
-          ${{steps.sign_app.outputs.signedReleaseFile}}
+        #  ${{steps.sign_app.outputs.signedReleaseFile}}
         name: ${{ github.pull_request_target }} ${{ github.GITHUB_BASE_REF }} ${{ github.run_id }}
         tag_name: ${{ github.run_id }} ${{ github.pull_request_target }}
         draft: false
