@@ -6,9 +6,6 @@
 
 tasks:
   -init: bash gradlew assembleDebug
-  #- init: gem install bundler
-  #- run: bundle install
-  #- run: fastlane beta
 
 
 
