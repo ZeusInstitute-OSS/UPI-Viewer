@@ -29,22 +29,13 @@ jobs:
       run: chmod +x gradlew
     - name: Build with Gradle
       run: ./gradlew assembleDebug
-      #run: ./gradlew assembleRelease
-      #run: ./gradlew assembleDebug
-   # - name: Build with FastLane
-   #   run: |
-    #    sudo gem install fastlane
-    #    bundle exec fastlane beta
-   #     sudo apt update
-   #     sudo apt install gnupg2 -y
-   #     sudo chmod +rwx /var/lib/gems/ --recursive
-   #     sudo chmod +rwx /home/runner/work/untitled-upi-for-android-4/untitled-upi-for-android-4 --recursive
-   #     sudo chown -R $USER /var/lib/gems/
-   #     sudo chown -R $USER /home/runner/work/untitled-upi-for-android-4/untitled-upi-for-android-4
-   #      gem install bundler
-   #     bundle update
-      #  bundle exec fastlane beta
-     #   fastlane beta
+
+    - name: Get Build Tool Version
+      shell: bash
+      run: |
+        BUILD_TOOL_VERSION=$(ls /usr/local/lib/android/sdk/build-tools/ | tail -n 1)
+        echo "BUILD_TOOL_VERSION=$BUILD_TOOL_VERSION" >> $GITHUB_ENV
+        echo Last build tool version is: $BUILD_TOOL_VERSION
 
     - name: Sign apk
       uses: r0adkll/sign-android-release@v1
@@ -55,8 +46,8 @@ jobs:
         alias: ${{ secrets.ALIAS }}
         keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
         keyPassword: ${{ secrets.KEY_PASSWORD }}
-      #env:
-        #BUILD_TOOLS_VERSION: "33.0.2"
+      env:
+        BUILD_TOOLS_VERSION: ${{ env.BUILD_TOOL_VERSION }}
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v2
@@ -64,13 +55,12 @@ jobs:
           name: App-Artifact
           path: |
             app/build/outputs/apk/*/*.apk
-          #  ${{steps.sign_app.outputs.signedReleaseFile}}
+
     - name: Upload to Release
       uses: xresloader/upload-to-github-release@v1
       with:
         file: |
           app/build/outputs/apk/*/*.apk
-        #  ${{steps.sign_app.outputs.signedReleaseFile}}
         default_release_name: kotlin ${{ github.pull_request_target }} ${{ github.run_id }}
         tag_name: ${{ github.run_id }} ${{ github.pull_request_target }}
         draft: false
