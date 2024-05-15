@@ -17,7 +17,7 @@ Lite Version/Minimum Viable Prototype
 
 ### Basic prototype:
 1. SMS TTS(send/receive) : *️⃣
-2. Selecting the right license for the project : ❌ 
+2. Selecting the right license for the project : ✅
 3. Signed APKs : ✅ 
 4. Support addon hardware : ❌
 
