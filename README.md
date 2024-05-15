@@ -3,6 +3,8 @@ UPI and card POS system for android 4 and above.
 WIP, doesn't work yet.
 Redoing using React Native with re-imagined Roadmap
 
+Abandoned for now.
+
 Disclaimer:
 UPI Qr is not mine, all rights to https://upiqr.in/?name=SHAKTI&vpa=SHAKTI.41215081@hdfcbank&print=true
 
