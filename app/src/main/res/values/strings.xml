@@ -60,10 +60,10 @@
     <string name="image3">dummy image for upi placeholder\n</string>
     <string name="dummyupi">1234567890@zeusinstitute</string>
     <string name="apikey" />
-    <string name="apikey1">Enter Paytm API Key</string>
+    <string name="apikey1">Enter UPI Id</string>
     <string name="login">Log In</string>
-    <string name="loginname">Log In To Paytm API</string>
-    <string name="login1">Log In Using Paytm API Keys</string>
+    <string name="loginname">Enter UPI Id</string>
+    <string name="login1">Enter UPI Id</string>
     <string name="backlogin">Go Back</string>
     <!-- Strings related to login -->
     <string name="prompt_email">Email</string>
