@@ -1,4 +1,4 @@
-package com.example.upiapp
+package com.zeusinstitute.upiapp
 
 import org.junit.Test
 

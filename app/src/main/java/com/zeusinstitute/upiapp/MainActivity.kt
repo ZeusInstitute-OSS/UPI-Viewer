@@ -1,4 +1,4 @@
-package com.example.upiapp
+package com.zeusinstitute.upiapp
 
 import android.app.FragmentTransaction
 import android.os.Bundle
@@ -10,7 +10,8 @@ import androidx.core.view.WindowCompat
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
-import com.example.upiapp.databinding.ActivityMainBinding
+import com.zeusinstitute.upiapp.R
+import com.zeusinstitute.upiapp.databinding.ActivityMainBinding
 import com.google.android.material.snackbar.Snackbar
 
 class MainActivity : AppCompatActivity() {

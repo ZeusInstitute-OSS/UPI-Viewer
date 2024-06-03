@@ -1,6 +1,6 @@
-package com.example.upiapp.data
+package com.zeusinstitute.upiapp.data
 
-import com.example.upiapp.data.model.LoggedInUser
+import com.zeusinstitute.upiapp.data.model.LoggedInUser
 
 /**
  * Class that requests authentication and user information from the remote data source and

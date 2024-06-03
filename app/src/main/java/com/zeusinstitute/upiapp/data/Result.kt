@@ -1,4 +1,4 @@
-package com.example.upiapp.data
+package com.zeusinstitute.upiapp.data
 
 /**
  * A generic class that holds a value with its loading status.
