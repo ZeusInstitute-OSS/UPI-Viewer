@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools" >
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-sdk
+        tools:overrideLibrary="com.google.zxing.client.android" />
 
     <application
         android:allowBackup="true"
@@ -39,5 +41,4 @@
                 android:value=".MainActivity" />
         </activity>
     </application>
-
 </manifest>

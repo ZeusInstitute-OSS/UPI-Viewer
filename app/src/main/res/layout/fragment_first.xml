@@ -12,14 +12,14 @@
         android:padding="16dp">
 
         <ImageView
-            android:id="@+id/imageView3"
+            android:id="@+id/qrCodeImageView"
             android:layout_width="324dp"
             android:layout_height="315dp"
             android:layout_marginTop="66dp"
             android:layout_marginEnd="160dp"
             android:layout_marginRight="160dp"
             android:layout_marginBottom="16dp"
-            android:contentDescription="@string/image3"
+            android:contentDescription="Generated QR Image"
             android:visibility="visible"
             app:layout_constraintBottom_toTopOf="@+id/textView2"
             app:layout_constraintEnd_toEndOf="parent"
@@ -28,8 +28,6 @@
             app:layout_constraintTop_toTopOf="parent"
             tools:src="@tools:sample/backgrounds/scenic[2]"
             android:src="@drawable/upiqr"
-
-
             tools:visibility="visible" />
 
         <TextView
