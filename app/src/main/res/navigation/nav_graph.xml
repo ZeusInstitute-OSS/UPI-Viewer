@@ -18,6 +18,9 @@
               <action
                   android:id="@+id/action_firstFragment_to_aboutApp"
                   app:destination="@id/aboutApp" />
+              <action
+                  android:id="@+id/action_firstFragment_to_splitBillFragment"
+                  app:destination="@id/splitBillFragment" />
        </fragment>
        <fragment
            android:id="@+id/login"
@@ -33,4 +36,8 @@
            android:id="@+id/aboutApp"
            android:name="AboutAppFragment"
            android:label="About App" />
+       <fragment
+           android:id="@+id/splitBillFragment"
+           android:name="SplitBillFragment"
+           android:label="SplitBillFragment" />
 </navigation>

@@ -11,7 +11,10 @@
     <item android:title="Send Card" />
     <item android:title="More Options" >
         <menu >
-            <item android:title="Split The Bill" />
+            <item
+                android:id="@+id/SplitBill"
+                android:title="Split The Bill" />
+
         </menu>
     </item>
     <item android:title="Hardware" ></item>
