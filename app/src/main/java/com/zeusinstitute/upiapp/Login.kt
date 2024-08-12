@@ -8,14 +8,24 @@ import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.textfield.TextInputEditText
 
 class Login : Fragment() {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        val toolbar = (activity as? AppCompatActivity)?.supportActionBar?.customView as? Toolbar
+        toolbar?.visibility = View.GONE
+    }
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -24,6 +34,12 @@ class Login : Fragment() {
 
         val apikey = view.findViewById<TextInputEditText>(R.id.apikey)
         val submitButton = view.findViewById<Button>(R.id.submitButton)
+
+        // Access the Toolbar
+        val toolbar = (activity as? AppCompatActivity)?.supportActionBar?.customView as? Toolbar
+
+        // Remove the hamburger menu IMMEDIATELY
+        toolbar?.navigationIcon = null
 
         submitButton.setOnClickListener {
             val data = apikey.text.toString()
@@ -40,6 +56,5 @@ class Login : Fragment() {
         }
         return view
     }
+
 }
-
-
