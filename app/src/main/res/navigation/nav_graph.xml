@@ -3,29 +3,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/FirstFragment">
-
-
-<activity
-android:id="@+id/mainActivity"
-android:name="com.zeusinstitute.upiapp.MainActivity"
-android:label="activity_main"
-tools:layout="@layout/activity_main" />
+    app:startDestination="@id/firstFragment">
        <fragment
-           android:id="@+id/FirstFragment"
+           android:id="@+id/firstFragment"
            android:name="com.zeusinstitute.upiapp.FirstFragment"
-           android:label="@string/first_fragment_label"
-           tools:layout="@layout/fragment_first">
+           android:label="fragment_first"
+           tools:layout="@layout/fragment_first" >
+              <action
+                  android:id="@+id/action_firstFragment_to_login"
+                  app:destination="@id/login" />
        </fragment>
        <fragment
            android:id="@+id/login"
            android:name="com.zeusinstitute.upiapp.Login"
            android:label="fragment_login"
-           tools:layout="@layout/fragment_login" >
-              <action
-                  android:id="@+id/login_home"
-                  app:destination="@id/FirstFragment"/>
-       </fragment>
-
-
+           tools:layout="@layout/fragment_login" />
 </navigation>
