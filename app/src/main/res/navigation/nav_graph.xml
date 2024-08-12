@@ -12,10 +12,18 @@
               <action
                   android:id="@+id/action_firstFragment_to_login"
                   app:destination="@id/login" />
+              <action
+                  android:id="@+id/action_firstFragment_to_dynamicFragment"
+                  app:destination="@id/dynamicFragment" />
        </fragment>
        <fragment
            android:id="@+id/login"
            android:name="com.zeusinstitute.upiapp.Login"
            android:label="Enter UPI ID"
            tools:layout="@layout/fragment_login" />
+       <fragment
+           android:id="@+id/dynamicFragment"
+           android:name="com.zeusinstitute.upiapp.DynamicFragment"
+           android:label="Enter Amount"
+           tools:layout="@layout/fragment_dynamic" />
 </navigation>

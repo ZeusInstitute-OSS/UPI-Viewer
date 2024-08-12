@@ -4,6 +4,7 @@
     tools:context="com.zeusinstitute.upiapp.MainActivity">
     <item
         android:enabled="true"
+        android:id="@+id/DynUPI"
         android:title="Recieve UPI" />
     <item android:title="Recieve Card" />
     <item android:title="Send UPI" />
