@@ -7,7 +7,7 @@
        <fragment
            android:id="@+id/firstFragment"
            android:name="com.zeusinstitute.upiapp.FirstFragment"
-           android:label="fragment_first"
+           android:label="UPI Viewer"
            tools:layout="@layout/fragment_first" >
               <action
                   android:id="@+id/action_firstFragment_to_login"
@@ -16,6 +16,6 @@
        <fragment
            android:id="@+id/login"
            android:name="com.zeusinstitute.upiapp.Login"
-           android:label="fragment_login"
+           android:label="Enter UPI ID"
            tools:layout="@layout/fragment_login" />
 </navigation>
