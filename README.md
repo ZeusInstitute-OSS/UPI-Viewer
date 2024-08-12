@@ -16,7 +16,9 @@ WIP, doesn't work yet
 
 ### Basic prototype:
 1. SMS TTS(send/receive) : *️⃣
-2. Selecting the right license for the project : ✅
-3. Signed APKs : ✅ 
-4. Support addon hardware : ❌
+2. QR Scanning: ✅
+3. Basic Navigation and UI: *️⃣
+4. Selecting the right license for the project : ✅
+5. Signed APKs : ✅ 
+6. Support addon hardware : ❌
 
