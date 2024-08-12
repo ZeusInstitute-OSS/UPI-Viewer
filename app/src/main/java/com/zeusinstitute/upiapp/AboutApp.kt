@@ -1,3 +1,4 @@
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
@@ -5,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.zeusinstitute.upiapp.R
 
@@ -30,8 +32,10 @@ class AboutAppFragment : Fragment() {
 
     private fun openUrl(url: String) {
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-        if (intent.resolveActivity(requireActivity().packageManager) != null) {
+        try {
             startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            Toast.makeText(context, "No application can handle this request. Please install a web browser.", Toast.LENGTH_LONG).show()
         }
     }
 }
