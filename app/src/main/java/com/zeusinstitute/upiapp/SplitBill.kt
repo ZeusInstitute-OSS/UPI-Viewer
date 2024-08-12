@@ -89,20 +89,20 @@ class SplitBillFragment : Fragment() {
         // Generate QR Button
         generateQrButton.setOnClickListener {
             qrCodeDataList.clear() // Clear previous QR codes
-            val totalAmount = totalAmountEditText.text.toString().toIntOrNull() ?: 0
+            //val totalAmount = totalAmountEditText.text.toString().toIntOrNull() ?: 0
             val payee1Amount = payee1EditText.text.toString().toIntOrNull() ?: 0
             val payee2Amount = payee2EditText.text.toString().toIntOrNull() ?: 0
             val payee3Amount = payee3EditText.text.toString().toIntOrNull() ?: 0
 
             // Generate QR codes (using the retrieved savedData)
-            generateQRCode(savedData, totalAmount, 0)?.let { qrCodeDataList.add(it) }
+            //generateQRCode(savedData, totalAmount, 0)?.let { qrCodeDataList.add(it) }
             generateQRCode(savedData, payee1Amount, 1)?.let { qrCodeDataList.add(it) }
             generateQRCode(savedData, payee2Amount, 2)?.let { qrCodeDataList.add(it) }
             generateQRCode(savedData, payee3Amount, 3)?.let { qrCodeDataList.add(it) }
 
             // Generate QR codes for dynamically added payees
             for (i in 0 until dynamicPayeesContainer.childCount) {
-                val editText = dynamicPayeesContainer.getChildAt(i) as? EditText
+                val editText = dynamicPayeesContainer.getChildAt(i+1) as? EditText
                 val amount = editText?.text.toString().toIntOrNull() ?: 0
                 generateQRCode(savedData, amount, i + 4)?.let { qrCodeDataList.add(it) }
             }
@@ -142,7 +142,7 @@ class SplitBillFragment : Fragment() {
 
         // Add amounts from dynamically created EditTexts
         for (i in 0 until dynamicPayeesContainer.childCount) {
-            val editText = dynamicPayeesContainer.getChildAt(i) as? EditText
+            val editText = dynamicPayeesContainer.getChildAt(i+1) as? EditText
             paidAmount += editText?.text.toString().toIntOrNull() ?: 0
         }
 
