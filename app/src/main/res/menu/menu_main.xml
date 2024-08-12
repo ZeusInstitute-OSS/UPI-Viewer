@@ -27,7 +27,10 @@
                 android:id="@+id/log_in"
                 android:title="@string/login"/>
             <item android:title="Update" />
-            <item android:title="About App" />
+            <item
+                android:enabled="true"
+                android:id="@+id/AboutApp"
+                android:title="About App" />
         </menu>
     </item>
 </menu>

@@ -53,6 +53,10 @@ class MainActivity : AppCompatActivity() {
                 findNavController(R.id.nav_host_fragment_content_main).navigate(R.id.action_firstFragment_to_login)
                 true
             }
+            R.id.AboutApp -> {
+                findNavController(R.id.nav_host_fragment_content_main).navigate(R.id.action_firstFragment_to_aboutApp)
+                true
+            }
             R.id.DynUPI -> {
                 findNavController(R.id.nav_host_fragment_content_main).navigate(R.id.action_firstFragment_to_dynamicFragment)
                 true

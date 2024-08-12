@@ -15,6 +15,9 @@
               <action
                   android:id="@+id/action_firstFragment_to_dynamicFragment"
                   app:destination="@id/dynamicFragment" />
+              <action
+                  android:id="@+id/action_firstFragment_to_aboutApp"
+                  app:destination="@id/aboutApp" />
        </fragment>
        <fragment
            android:id="@+id/login"
@@ -26,4 +29,8 @@
            android:name="com.zeusinstitute.upiapp.DynamicFragment"
            android:label="Enter Amount"
            tools:layout="@layout/fragment_dynamic" />
+       <fragment
+           android:id="@+id/aboutApp"
+           android:name="AboutAppFragment"
+           android:label="About App" />
 </navigation>
