@@ -34,10 +34,10 @@
            tools:layout="@layout/fragment_dynamic" />
        <fragment
            android:id="@+id/aboutApp"
-           android:name="About App"
+           android:name="AboutAppFragment"
            android:label="About App" />
        <fragment
            android:id="@+id/splitBillFragment"
-           android:name="Split the Bill"
-           android:label="SplitBillFragment" />
+           android:name="SplitBillFragment"
+           android:label="Split the Bill" />
 </navigation>
