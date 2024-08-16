@@ -7,9 +7,11 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import com.google.android.material.textfield.TextInputEditText
 import com.google.zxing.BarcodeFormat
@@ -46,6 +48,11 @@ class DynamicFragment : Fragment() {
         amountEditText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 submitButton.performClick() // Trigger the submit button's click listener
+
+                // Hide the keyboard
+                val imm = getSystemService(requireContext(), InputMethodManager::class.java)
+                imm?.hideSoftInputFromWindow(amountEditText.windowToken, 0)
+
                 true
             } else {
                 false
