@@ -1,12 +1,13 @@
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.text.Editable
 import android.text.InputType
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -15,7 +16,6 @@ import com.google.zxing.WriterException
 import com.journeyapps.barcodescanner.BarcodeEncoder
 import com.zeusinstitute.upiapp.R
 
-// Data class to hold payee information
 data class PayeeData(val amount: Int, val qrCode: Bitmap?, val payeeNumber: Int)
 
 class SplitBillFragment : Fragment() {
@@ -34,14 +34,10 @@ class SplitBillFragment : Fragment() {
     private val qrCodeDataList: MutableList<PayeeData> = mutableListOf()
     private lateinit var qrCodeAdapter: QRCodeAdapter
 
-    private var numPayeesCreated = 3 // Start with 3 persistent payees
-    private lateinit var savedData: String // To store the saved UPI ID
+    private var numPayeesCreated = 3
+    private lateinit var savedData: String
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_split_bill, container, false)
 
         // Initialize view references
@@ -67,6 +63,13 @@ class SplitBillFragment : Fragment() {
         qrCodeRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         qrCodeRecyclerView.adapter = qrCodeAdapter
 
+        // Add TextWatcher to update remaining amount
+        val textWatcher = createTextWatcher()
+        totalAmountEditText.addTextChangedListener(textWatcher)
+        payee1EditText.addTextChangedListener(textWatcher)
+        payee2EditText.addTextChangedListener(textWatcher)
+        payee3EditText.addTextChangedListener(textWatcher)
+
         // Add Payee Button
         addPayeeButton.setOnClickListener {
             numPayeesCreated++
@@ -76,73 +79,62 @@ class SplitBillFragment : Fragment() {
         // Clear Button
         clearButton.setOnClickListener {
             totalAmountEditText.text.clear()
-            remainingAmountTextView.text = "Remaining amount: 0"
             payee1EditText.text.clear()
             payee2EditText.text.clear()
             payee3EditText.text.clear()
-            dynamicPayeesContainer.removeAllViews() // Remove dynamically added EditTexts
+            dynamicPayeesContainer.removeAllViews()
             qrCodeDataList.clear()
             qrCodeAdapter.notifyDataSetChanged()
-            numPayeesCreated = 3 // Reset number of payees created
+            numPayeesCreated = 3
+            updateRemainingAmount()
         }
 
         // Generate QR Button
         generateQrButton.setOnClickListener {
-            qrCodeDataList.clear() // Clear previous QR codes
-            //val totalAmount = totalAmountEditText.text.toString().toIntOrNull() ?: 0
-            val payee1Amount = payee1EditText.text.toString().toIntOrNull() ?: 0
-            val payee2Amount = payee2EditText.text.toString().toIntOrNull() ?: 0
-            val payee3Amount = payee3EditText.text.toString().toIntOrNull() ?: 0
+            qrCodeDataList.clear()
+            generateQRCodeForPayee(payee1EditText, 1)
+            generateQRCodeForPayee(payee2EditText, 2)
+            generateQRCodeForPayee(payee3EditText, 3)
 
-            // Generate QR codes (using the retrieved savedData)
-            //generateQRCode(savedData, totalAmount, 0)?.let { qrCodeDataList.add(it) }
-            generateQRCode(savedData, payee1Amount, 1)?.let { qrCodeDataList.add(it) }
-            generateQRCode(savedData, payee2Amount, 2)?.let { qrCodeDataList.add(it) }
-            generateQRCode(savedData, payee3Amount, 3)?.let { qrCodeDataList.add(it) }
-
-            // Generate QR codes for dynamically added payees
             for (i in 0 until dynamicPayeesContainer.childCount) {
-                val editText = dynamicPayeesContainer.getChildAt(i+1) as? EditText
-                val amount = editText?.text.toString().toIntOrNull() ?: 0
-                generateQRCode(savedData, amount, i + 4)?.let { qrCodeDataList.add(it) }
+                val editText = dynamicPayeesContainer.getChildAt(i) as? EditText
+                generateQRCodeForPayee(editText, i + 4)
             }
 
             qrCodeAdapter.notifyDataSetChanged()
-            updateRemainingAmount()
         }
-
-        // Listen for changes in total amount and payee amounts to update remaining amount
-        totalAmountEditText.addTextChangedListener { updateRemainingAmount() }
-        payee1EditText.addTextChangedListener { updateRemainingAmount() }
-        payee2EditText.addTextChangedListener { updateRemainingAmount() }
-        payee3EditText.addTextChangedListener { updateRemainingAmount() }
 
         return view
     }
 
-    private fun addNewPayeeEditText() {
-        val editText = EditText(requireContext())
-        editText.hint = "Enter payee $numPayeesCreated amount"
-        editText.inputType = InputType.TYPE_CLASS_NUMBER
-        editText.layoutParams = LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT,
-            LinearLayout.LayoutParams.WRAP_CONTENT
-        )
-        dynamicPayeesContainer.addView(editText)
+    private fun createTextWatcher(): TextWatcher {
+        return object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) { updateRemainingAmount() }
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        }
+    }
 
-        // Add a text changed listener to the new EditText
-        editText.addTextChangedListener { updateRemainingAmount() }
+    private fun addNewPayeeEditText() {
+        val editText = EditText(requireContext()).apply {
+            hint = "Enter payee $numPayeesCreated amount"
+            inputType = InputType.TYPE_CLASS_NUMBER
+            layoutParams = LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+            )
+            addTextChangedListener(createTextWatcher())
+        }
+        dynamicPayeesContainer.addView(editText)
     }
 
     private fun updateRemainingAmount() {
         val totalAmount = totalAmountEditText.text.toString().toIntOrNull() ?: 0
-        var paidAmount = payee1EditText.text.toString().toIntOrNull() ?: 0
-        paidAmount += payee2EditText.text.toString().toIntOrNull() ?: 0
-        paidAmount += payee3EditText.text.toString().toIntOrNull() ?: 0
+        var paidAmount = listOf(payee1EditText, payee2EditText, payee3EditText)
+            .sumOf { it.text.toString().toIntOrNull() ?: 0 }
 
-        // Add amounts from dynamically created EditTexts
         for (i in 0 until dynamicPayeesContainer.childCount) {
-            val editText = dynamicPayeesContainer.getChildAt(i+1) as? EditText
+            val editText = dynamicPayeesContainer.getChildAt(i) as? EditText
             paidAmount += editText?.text.toString().toIntOrNull() ?: 0
         }
 
@@ -150,10 +142,15 @@ class SplitBillFragment : Fragment() {
         remainingAmountTextView.text = "Remaining amount: $remainingAmount"
     }
 
+    private fun generateQRCodeForPayee(editText: EditText?, payeeNumber: Int) {
+        val amount = editText?.text.toString().toIntOrNull() ?: 0
+        generateQRCode(savedData, amount, payeeNumber)?.let { qrCodeDataList.add(it) }
+    }
+
     private fun generateQRCode(upiId: String, amount: Int, payeeNumber: Int): PayeeData? {
-        if (amount <= 0) return null // Don't generate QR code for zero or negative amounts
+        if (amount <= 0) return null
         val barcodeEncoder = BarcodeEncoder()
-        val upiString = "upi://pay?pa=$upiId&tn=undefined&am=$amount" // Replace with your actual UPI string format
+        val upiString = "upi://pay?pa=$upiId&tn=undefined&am=$amount"
         return try {
             val qrCode = barcodeEncoder.encodeBitmap(upiString, BarcodeFormat.QR_CODE, 200, 200)
             PayeeData(amount, qrCode, payeeNumber)
@@ -163,13 +160,12 @@ class SplitBillFragment : Fragment() {
         }
     }
 
-    // RecyclerView Adapter for QR Codes
     inner class QRCodeAdapter(private val qrCodeDataList: List<PayeeData>) :
         RecyclerView.Adapter<QRCodeAdapter.QRCodeViewHolder>() {
 
         inner class QRCodeViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
             val qrCodeImageView: ImageView = itemView.findViewById(R.id.qrCodeImageView)
-            val payeeTextView: TextView = itemView.findViewById(R.id.payeeTextView) // Add this to qr_code_item.xml
+            val payeeTextView: TextView = itemView.findViewById(R.id.payeeTextView)
         }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): QRCodeViewHolder {
@@ -181,7 +177,7 @@ class SplitBillFragment : Fragment() {
         override fun onBindViewHolder(holder: QRCodeViewHolder, position: Int) {
             val payeeData = qrCodeDataList[position]
             holder.qrCodeImageView.setImageBitmap(payeeData.qrCode)
-            holder.payeeTextView.text = "Payee ${payeeData.payeeNumber + 1}: ₹${payeeData.amount}"
+            holder.payeeTextView.text = "Payee ${payeeData.payeeNumber}: ₹${payeeData.amount}"
         }
 
         override fun getItemCount(): Int = qrCodeDataList.size
