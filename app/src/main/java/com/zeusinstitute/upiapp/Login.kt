@@ -4,6 +4,8 @@ package com.zeusinstitute.upiapp
 
 import android.content.Context
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,6 +13,8 @@ import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import android.view.inputmethod.InputMethodManager
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.textfield.TextInputEditText
@@ -34,6 +38,19 @@ class Login : Fragment() {
         val apikey = view.findViewById<TextInputEditText>(R.id.apikey)
         val submitButton = view.findViewById<Button>(R.id.submitButton)
 
+        // Initially hide the submitButton
+        submitButton.visibility = View.GONE
+
+        // Add TextWatcher to apikey
+        apikey.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                submitButton.visibility = if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
+
         // Access the Toolbar
         val toolbar = (activity as? AppCompatActivity)?.supportActionBar?.customView as? Toolbar
 
@@ -44,6 +61,12 @@ class Login : Fragment() {
         apikey.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
                 submitButton.performClick()
+
+                // Hide Keyboard
+                val imm =
+                    ContextCompat.getSystemService(requireContext(), InputMethodManager::class.java)
+                imm?.hideSoftInputFromWindow(apikey.windowToken, 0)
+
                 true
             } else {
                 false
