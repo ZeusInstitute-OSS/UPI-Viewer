@@ -16,6 +16,7 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.textfield.TextInputEditText
 
@@ -52,7 +53,7 @@ class Login : Fragment() {
             }
 
             // Navigate back to FirstFragment (you might need to adjust this based on your navigation setup)
-            requireActivity().supportFragmentManager.popBackStack()
+            findNavController().navigate(R.id.action_login_to_firstFragment)
         }
         return view
     }
