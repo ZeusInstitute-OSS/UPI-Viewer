@@ -26,6 +26,8 @@ class DynamicFragment : Fragment() {
     private lateinit var upiIdTextView: TextView
     private lateinit var amountEditText: TextInputEditText
     private lateinit var submitButton: Button
+    private lateinit var amountTextView: TextView
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -37,6 +39,7 @@ class DynamicFragment : Fragment() {
         upiIdTextView = view.findViewById(R.id.upiIdTextView)
         amountEditText = view.findViewById(R.id.amountEditText)
         submitButton = view.findViewById(R.id.submitButton)
+        amountTextView = view.findViewById(R.id.amountTextView)
 
         // Initially hide the submitButton
         submitButton.visibility = View.GONE
@@ -55,6 +58,9 @@ class DynamicFragment : Fragment() {
         val sharedPref = requireActivity().getPreferences(Context.MODE_PRIVATE)
         val savedData = sharedPref.getString("saved_data", "") ?: ""
         upiIdTextView.text = savedData
+
+        // Initially hide the amountTextView
+        amountTextView.visibility = View.GONE
 
         // Initial QR code generation
         updateQRCode(savedData, "")
@@ -76,6 +82,16 @@ class DynamicFragment : Fragment() {
 
         submitButton.setOnClickListener {
             val amount = amountEditText.text.toString()
+
+            // Show amount below savedData
+            amountTextView.text = "Amount: ₹$amount"
+            amountTextView.visibility = View.VISIBLE
+
+            // Hide submitButton and clear amountEditText after QR generation
+            submitButton.visibility = View.GONE
+            amountEditText.text?.clear()
+
+            // Update QR code
             updateQRCode(savedData, amount)
         }
 
