@@ -3,6 +3,7 @@ package com.zeusinstitute.upiapp
 import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Bitmap
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -33,18 +34,17 @@ class FirstFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeList
     ): View? {
         _binding = FragmentFirstBinding.inflate(inflater, container, false)
         qrCodeImageView = binding.qrCodeImageView // Initialize qrCodeImageView
+
+        // Make status bar transparent
+        val window = requireActivity().window
+        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+        window.statusBarColor = Color.TRANSPARENT
+
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        // Hide system bars for fullscreen
-        val windowInsetsController =
-            ViewCompat.getWindowInsetsController(requireActivity().window.decorView)
-        windowInsetsController?.systemBarsBehavior =
-            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-        windowInsetsController?.hide(WindowInsetsCompat.Type.systemBars())
 
         sharedPref = requireActivity().getPreferences(Context.MODE_PRIVATE)
         sharedPref.registerOnSharedPreferenceChangeListener(this) // Register listener
@@ -84,6 +84,9 @@ class FirstFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeList
         val windowInsetsController =
             ViewCompat.getWindowInsetsController(requireActivity().window.decorView)
         windowInsetsController?.show(WindowInsetsCompat.Type.systemBars())
+        val window = requireActivity().window
+        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+        window.statusBarColor = Color.TRANSPARENT // or any other color you want
         _binding = null
     }
 }
