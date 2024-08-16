@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
@@ -40,6 +41,16 @@ class DynamicFragment : Fragment() {
 
         // Initial QR code generation
         updateQRCode(savedData, "")
+
+        // Set up the listener for the "Enter" key on the keyboard
+        amountEditText.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                submitButton.performClick() // Trigger the submit button's click listener
+                true
+            } else {
+                false
+            }
+        }
 
         submitButton.setOnClickListener {
             val amount = amountEditText.text.toString()
