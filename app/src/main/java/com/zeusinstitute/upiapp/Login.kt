@@ -2,22 +2,17 @@
 
 package com.zeusinstitute.upiapp
 
-
-
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
-import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.textfield.TextInputEditText
 
 class Login : Fragment() {
@@ -27,6 +22,7 @@ class Login : Fragment() {
         val toolbar = (activity as? AppCompatActivity)?.supportActionBar?.customView as? Toolbar
         toolbar?.visibility = View.GONE
     }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -45,17 +41,27 @@ class Login : Fragment() {
         submitButton.setOnClickListener {
             val data = apikey.text.toString()
 
-            // Save data to Shared Preferences
-            val sharedPref = requireActivity().getPreferences(Context.MODE_PRIVATE) ?: return@setOnClickListener
-            with (sharedPref.edit()) {
-                putString("saved_data", data)
-                apply()
-            }
+            if (isValidUpiId(data)) {
+                // Save data to Shared Preferences
+                val sharedPref = requireActivity().getPreferences(Context.MODE_PRIVATE) ?: return@setOnClickListener
+                with (sharedPref.edit()) {
+                    putString("saved_data", data)
+                    apply()
+                }
 
-            // Navigate back to FirstFragment (you might need to adjust this based on your navigation setup)
-            findNavController().navigate(R.id.action_login_to_firstFragment)
+                // Navigate back to FirstFragment
+                findNavController().navigate(R.id.action_login_to_firstFragment)
+            } else {
+                // Show error message if UPI ID is invalid
+                Toast.makeText(context, "Invalid UPI ID. Please check and try again.", Toast.LENGTH_SHORT).show()
+            }
         }
         return view
     }
 
+    private fun isValidUpiId(upiId: String): Boolean {
+        // UPI ID validation rules
+        val upiIdRegex = Regex("^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+$")
+        return upiId.contains("@") && !upiId.contains(" ") && upiIdRegex.matches(upiId)
+    }
 }
