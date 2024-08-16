@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.graphics.Bitmap
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -33,12 +34,14 @@ class FirstFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeList
         savedInstanceState: Bundle?
     ): View? {
         _binding = FragmentFirstBinding.inflate(inflater, container, false)
-        qrCodeImageView = binding.qrCodeImageView // Initialize qrCodeImageView
+        qrCodeImageView = binding.qrCodeImageView
 
-        // Make status bar transparent
-        val window = requireActivity().window
-        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-        window.statusBarColor = Color.TRANSPARENT
+        // Make status bar transparent (conditionally for Lollipop and above)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            val window = requireActivity().window
+            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+            window.statusBarColor = Color.TRANSPARENT
+        }
 
         return binding.root
     }
@@ -81,12 +84,14 @@ class FirstFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeList
     override fun onDestroyView() {
         super.onDestroyView()
         sharedPref.unregisterOnSharedPreferenceChangeListener(this) // Unregister listener
-        val windowInsetsController =
-            ViewCompat.getWindowInsetsController(requireActivity().window.decorView)
-        windowInsetsController?.show(WindowInsetsCompat.Type.systemBars())
-        val window = requireActivity().window
-        window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-        window.statusBarColor = Color.TRANSPARENT // or any other color you want
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            val windowInsetsController =
+                ViewCompat.getWindowInsetsController(requireActivity().window.decorView)
+            windowInsetsController?.show(WindowInsetsCompat.Type.systemBars())
+            val window = requireActivity().window
+            window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+            window.statusBarColor = Color.TRANSPARENT // or any other color you want
+        }
         _binding = null
     }
 }

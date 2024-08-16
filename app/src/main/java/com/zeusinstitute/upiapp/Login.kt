@@ -9,12 +9,12 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.textfield.TextInputEditText
+import com.google.android.material.textfield.TextInputLayout
 
 class Login : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -30,6 +30,7 @@ class Login : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_login, container, false)
 
+        val apikeyLayout = view.findViewById<TextInputLayout>(R.id.apikeyLayout)
         val apikey = view.findViewById<TextInputEditText>(R.id.apikey)
         val submitButton = view.findViewById<Button>(R.id.submitButton)
 
@@ -42,7 +43,7 @@ class Login : Fragment() {
         // Set up the listener for the "Enter" key on the keyboard
         apikey.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                submitButton.performClick() // Trigger the submit button's click listener
+                submitButton.performClick()
                 true
             } else {
                 false
@@ -52,7 +53,8 @@ class Login : Fragment() {
         submitButton.setOnClickListener {
             val data = apikey.text.toString()
 
-            if (isValidUpiId(data)) {
+            val invalidReasons = getInvalidUpiIdReasons(data) // Get multiple reasons
+            if (invalidReasons.isEmpty()) {
                 // Save data to Shared Preferences
                 val sharedPref = requireActivity().getPreferences(Context.MODE_PRIVATE) ?: return@setOnClickListener
                 with (sharedPref.edit()) {
@@ -63,8 +65,8 @@ class Login : Fragment() {
                 // Navigate back to FirstFragment
                 findNavController().navigate(R.id.action_login_to_firstFragment)
             } else {
-                // Show error message if UPI ID is invalid
-                Toast.makeText(context, "Invalid UPI ID. Please check and try again.", Toast.LENGTH_SHORT).show()
+                // Show error message directly in the TextInputLayout with all reasons
+                apikeyLayout.error = "Invalid UPI ID:\n${invalidReasons.joinToString("\n")}"
             }
         }
         return view
@@ -74,5 +76,19 @@ class Login : Fragment() {
         // UPI ID validation rules
         val upiIdRegex = Regex("^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+$")
         return upiId.contains("@") && !upiId.contains(" ") && upiIdRegex.matches(upiId)
+    }
+
+    private fun getInvalidUpiIdReasons(upiId: String): List<String> {
+        val reasons = mutableListOf<String>()
+        if (!upiId.contains("@")) {
+            reasons.add("Must contain '@'") // Rule 2
+        }
+        if (upiId.contains(" ")) {
+            reasons.add("Should not contain whitespace") // Rule 3
+        }
+        if (!Regex("^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+$").matches(upiId)) {
+            reasons.add("Invalid characters used") // Rule 1 (and implicitly covers Rule 4)
+        }
+        return reasons
     }
 }
