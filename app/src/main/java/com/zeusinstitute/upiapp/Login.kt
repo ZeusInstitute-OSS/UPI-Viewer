@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -37,6 +38,16 @@ class Login : Fragment() {
 
         // Remove the hamburger menu IMMEDIATELY
         toolbar?.navigationIcon = null
+
+        // Set up the listener for the "Enter" key on the keyboard
+        apikey.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                submitButton.performClick() // Trigger the submit button's click listener
+                true
+            } else {
+                false
+            }
+        }
 
         submitButton.setOnClickListener {
             val data = apikey.text.toString()
