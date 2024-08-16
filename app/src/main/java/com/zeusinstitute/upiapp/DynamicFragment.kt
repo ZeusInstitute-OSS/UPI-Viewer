@@ -3,6 +3,8 @@ package com.zeusinstitute.upiapp
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -36,7 +38,20 @@ class DynamicFragment : Fragment() {
         amountEditText = view.findViewById(R.id.amountEditText)
         submitButton = view.findViewById(R.id.submitButton)
 
-        // Get saved UPI ID from SharedPreferences
+        // Initially hide the submitButton
+        submitButton.visibility = View.GONE
+
+        // Add TextWatcher to amountEditText
+        amountEditText.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                submitButton.visibility = if (s.isNullOrEmpty()) View.GONE else View.VISIBLE
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
+
+            // Get saved UPI ID from SharedPreferences
         val sharedPref = requireActivity().getPreferences(Context.MODE_PRIVATE)
         val savedData = sharedPref.getString("saved_data", "") ?: ""
         upiIdTextView.text = savedData
