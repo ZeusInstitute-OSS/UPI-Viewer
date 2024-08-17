@@ -28,6 +28,7 @@ class FirstFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeList
     private val binding get() = _binding!!
     private lateinit var qrCodeImageView: ImageView
     private lateinit var sharedPref: SharedPreferences
+    private lateinit var paymentMethod: String
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -63,8 +64,12 @@ class FirstFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeList
 
     private fun updateQRCode() {
         val savedData = sharedPref.getString("saved_data", null)
-        val upiString = "upi://pay?pa=$savedData&tn=undefined&am=undefined"
-
+        paymentMethod = sharedPref.getString("payment_method", "") ?: ""
+        val upiString = when (paymentMethod) {
+            "SGQR" -> "sgqr://pay?merchantId=$savedData"
+            "UPI" -> "upi://pay?pa=$savedData&tn=undefined"
+            else -> ""
+        }
         if (savedData != null) {
             binding.textView2.text = savedData
             generateQRCode(upiString, qrCodeImageView)

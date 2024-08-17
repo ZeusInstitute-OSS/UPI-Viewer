@@ -23,11 +23,13 @@ import com.journeyapps.barcodescanner.BarcodeEncoder
 class DynamicFragment : Fragment() {
 
     private lateinit var qrCodeImageView: ImageView
-    private lateinit var upiIdTextView: TextView
+    private lateinit var paymentIdTextView: TextView
     private lateinit var amountEditText: TextInputEditText
     private lateinit var submitButton: Button
     private lateinit var amountTextView: TextView
 
+    private lateinit var paymentMethod: String
+    private lateinit var currency: String
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,7 +38,7 @@ class DynamicFragment : Fragment() {
         val view = inflater.inflate(R.layout.fragment_dynamic, container, false)
 
         qrCodeImageView = view.findViewById(R.id.qrCodeImageView)
-        upiIdTextView = view.findViewById(R.id.upiIdTextView)
+        paymentIdTextView = view.findViewById(R.id.upiIdTextView)
         amountEditText = view.findViewById(R.id.amountEditText)
         submitButton = view.findViewById(R.id.submitButton)
         amountTextView = view.findViewById(R.id.amountTextView)
@@ -54,10 +56,13 @@ class DynamicFragment : Fragment() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
 
-            // Get saved UPI ID from SharedPreferences
+        // Get saved data from SharedPreferences
         val sharedPref = requireActivity().getPreferences(Context.MODE_PRIVATE)
         val savedData = sharedPref.getString("saved_data", "") ?: ""
-        upiIdTextView.text = savedData
+        paymentMethod = sharedPref.getString("payment_method", "") ?: ""
+        currency = sharedPref.getString("currency", "") ?: ""
+
+        paymentIdTextView.text = "$paymentMethod ID: $savedData"
 
         // Initially hide the amountTextView
         amountTextView.visibility = View.GONE
@@ -68,12 +73,9 @@ class DynamicFragment : Fragment() {
         // Set up the listener for the "Enter" key on the keyboard
         amountEditText.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
-                submitButton.performClick() // Trigger the submit button's click listener
-
-                // Hide the keyboard
+                submitButton.performClick()
                 val imm = getSystemService(requireContext(), InputMethodManager::class.java)
                 imm?.hideSoftInputFromWindow(amountEditText.windowToken, 0)
-
                 true
             } else {
                 false
@@ -84,7 +86,7 @@ class DynamicFragment : Fragment() {
             val amount = amountEditText.text.toString()
 
             // Show amount below savedData
-            amountTextView.text = "Amount: ₹$amount"
+            amountTextView.text = "Amount: ${getCurrencySymbol()}$amount"
             amountTextView.visibility = View.VISIBLE
 
             // Hide submitButton and clear amountEditText after QR generation
@@ -99,8 +101,12 @@ class DynamicFragment : Fragment() {
     }
 
     private fun updateQRCode(savedData: String, amount: String) {
-        val upiString = "upi://pay?pa=$savedData&tn=undefined&am=$amount"
-        generateQRCode(upiString, qrCodeImageView)
+        val qrString = when (paymentMethod) {
+            "SGQR" -> "sgqr://pay?merchantId=$savedData&$amount"
+            "UPI" -> "upi://pay?pa=$savedData&tn=undefined&am=$amount"
+            else -> ""
+        }
+        generateQRCode(qrString, qrCodeImageView)
     }
 
     private fun generateQRCode(text: String, imageView: ImageView) {
@@ -110,6 +116,14 @@ class DynamicFragment : Fragment() {
             imageView.setImageBitmap(bitmap)
         } catch (e: WriterException) {
             e.printStackTrace()
+        }
+    }
+
+    private fun getCurrencySymbol(): String {
+        return when (currency) {
+            "₹ (INR)" -> "₹"
+            "S$ (SGD)" -> "S$"
+            else -> ""
         }
     }
 }

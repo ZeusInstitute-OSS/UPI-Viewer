@@ -28,7 +28,7 @@ class SplitBillFragment : Fragment() {
     private lateinit var clearButton: Button
     private lateinit var generateQrButton: Button
     private lateinit var qrCodeRecyclerView: RecyclerView
-    private lateinit var upiIdTextView: TextView
+    private lateinit var paymentIdTextView: TextView
     private lateinit var dynamicPayeesContainer: LinearLayout
 
     private val qrCodeDataList: MutableList<PayeeData> = mutableListOf()
@@ -36,6 +36,8 @@ class SplitBillFragment : Fragment() {
 
     private var numPayeesCreated = 3
     private lateinit var savedData: String
+    private lateinit var paymentMethod: String
+    private lateinit var currency: String
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_split_bill, container, false)
@@ -50,13 +52,16 @@ class SplitBillFragment : Fragment() {
         clearButton = view.findViewById(R.id.clearButton)
         generateQrButton = view.findViewById(R.id.generateQrButton)
         qrCodeRecyclerView = view.findViewById(R.id.qrCodeRecyclerView)
-        upiIdTextView = view.findViewById(R.id.upiIdTextView)
+        paymentIdTextView = view.findViewById(R.id.upiIdTextView)
         dynamicPayeesContainer = view.findViewById(R.id.dynamicPayeesContainer)
 
-        // Get saved UPI ID from SharedPreferences
+        // Get saved data from SharedPreferences
         val sharedPref = requireActivity().getPreferences(Context.MODE_PRIVATE)
         savedData = sharedPref.getString("saved_data", "") ?: ""
-        upiIdTextView.text = "UPI ID: $savedData"
+        paymentMethod = sharedPref.getString("payment_method", "") ?: ""
+        currency = sharedPref.getString("currency", "") ?: ""
+
+        paymentIdTextView.text = "$paymentMethod ID: $savedData"
 
         // Initialize RecyclerView
         qrCodeAdapter = QRCodeAdapter(qrCodeDataList)
@@ -139,7 +144,7 @@ class SplitBillFragment : Fragment() {
         }
 
         val remainingAmount = totalAmount - paidAmount
-        remainingAmountTextView.text = "Remaining amount: $remainingAmount"
+        remainingAmountTextView.text = "Remaining amount: ${getCurrencySymbol()}$remainingAmount"
     }
 
     private fun generateQRCodeForPayee(editText: EditText?, payeeNumber: Int) {
@@ -147,16 +152,28 @@ class SplitBillFragment : Fragment() {
         generateQRCode(savedData, amount, payeeNumber)?.let { qrCodeDataList.add(it) }
     }
 
-    private fun generateQRCode(upiId: String, amount: Int, payeeNumber: Int): PayeeData? {
+    private fun generateQRCode(paymentId: String, amount: Int, payeeNumber: Int): PayeeData? {
         if (amount <= 0) return null
         val barcodeEncoder = BarcodeEncoder()
-        val upiString = "upi://pay?pa=$upiId&tn=undefined&am=$amount"
+        val qrString = when (paymentMethod) {
+            "SGQR" -> "sgqr://pay?merchantId=$paymentId&$amount"
+            "UPI" -> "upi://pay?pa=$paymentId&tn=undefined&am=$amount"
+            else -> return null
+        }
         return try {
-            val qrCode = barcodeEncoder.encodeBitmap(upiString, BarcodeFormat.QR_CODE, 200, 200)
+            val qrCode = barcodeEncoder.encodeBitmap(qrString, BarcodeFormat.QR_CODE, 200, 200)
             PayeeData(amount, qrCode, payeeNumber)
         } catch (e: WriterException) {
             e.printStackTrace()
             null
+        }
+    }
+
+    private fun getCurrencySymbol(): String {
+        return when (currency) {
+            "₹ (INR)" -> "₹"
+            "S$ (SGD)" -> "S$"
+            else -> ""
         }
     }
 
@@ -177,7 +194,7 @@ class SplitBillFragment : Fragment() {
         override fun onBindViewHolder(holder: QRCodeViewHolder, position: Int) {
             val payeeData = qrCodeDataList[position]
             holder.qrCodeImageView.setImageBitmap(payeeData.qrCode)
-            holder.payeeTextView.text = "Payee ${payeeData.payeeNumber}: ₹${payeeData.amount}"
+            holder.payeeTextView.text = "Payee ${payeeData.payeeNumber}: ${getCurrencySymbol()}${payeeData.amount}"
         }
 
         override fun getItemCount(): Int = qrCodeDataList.size
