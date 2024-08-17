@@ -23,3 +23,24 @@ WIP
 5. Signed APKs : ✅ 
 6. Support addon hardware : ❌
 
+### Other Countries:
+1. India
+- UPI
+	- Dynamic Works
+	- Split The Bill Works
+2. Singapore(Testing Needed)
+- SGQR
+	- Dynamic Works
+	- Split The Bill Works
+3. Thailand
+- Thai QR
+	- Dynamic Not Started
+	- Split The Bill Not Started
+4.  Vietnam
+- VietQR
+	- Dynamic Not Started
+	- Split The Bill Not Started
+5.  Indonesia
+- QRIS
+	- Dynamic Not Started
+	- Split The Bill Not Started
