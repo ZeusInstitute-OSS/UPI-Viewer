@@ -66,7 +66,7 @@ class FirstFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeList
         val savedData = sharedPref.getString("saved_data", null)
         paymentMethod = sharedPref.getString("payment_method", "") ?: ""
         val upiString = when (paymentMethod) {
-            "SGQR" -> "sgqr://pay?merchantId=$savedData"
+            //"SGQR" -> "sgqr://pay?merchantId=$savedData"
             "UPI" -> "upi://pay?pa=$savedData&tn=undefined"
             else -> ""
         }

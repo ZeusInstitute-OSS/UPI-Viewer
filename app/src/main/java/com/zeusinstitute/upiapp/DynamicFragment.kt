@@ -102,7 +102,7 @@ class DynamicFragment : Fragment() {
 
     private fun updateQRCode(savedData: String, amount: String) {
         val qrString = when (paymentMethod) {
-            "SGQR" -> "sgqr://pay?merchantId=$savedData&$amount"
+          //  "SGQR" -> "sgqr://pay?merchantId=$savedData&$amount"
             "UPI" -> "upi://pay?pa=$savedData&tn=undefined&am=$amount"
             else -> ""
         }
@@ -122,7 +122,7 @@ class DynamicFragment : Fragment() {
     private fun getCurrencySymbol(): String {
         return when (currency) {
             "₹ (INR)" -> "₹"
-            "S$ (SGD)" -> "S$"
+           // "S$ (SGD)" -> "S$"
             else -> ""
         }
     }

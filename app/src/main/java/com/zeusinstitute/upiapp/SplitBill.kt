@@ -156,7 +156,7 @@ class SplitBillFragment : Fragment() {
         if (amount <= 0) return null
         val barcodeEncoder = BarcodeEncoder()
         val qrString = when (paymentMethod) {
-            "SGQR" -> "sgqr://pay?merchantId=$paymentId&$amount"
+         //   "SGQR" -> "sgqr://pay?merchantId=$paymentId&$amount"
             "UPI" -> "upi://pay?pa=$paymentId&tn=undefined&am=$amount"
             else -> return null
         }
@@ -172,7 +172,7 @@ class SplitBillFragment : Fragment() {
     private fun getCurrencySymbol(): String {
         return when (currency) {
             "₹ (INR)" -> "₹"
-            "S$ (SGD)" -> "S$"
+         //   "S$ (SGD)" -> "S$"
             else -> ""
         }
     }

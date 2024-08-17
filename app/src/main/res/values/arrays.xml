@@ -13,23 +13,23 @@
     <!-- Countries -->
     <string-array name="countries">
         <item>India</item>
-        <item>Singapore</item>
+        <!-- <item>Singapore</item>-->
     </string-array>
 
     <string-array name="payment_methods_india">
         <item>UPI</item>
     </string-array>
 
-    <string-array name="payment_methods_singapore">
+  <!--  <string-array name="payment_methods_singapore">
         <item>SGQR</item>
-    </string-array>
+    </string-array>-->
 
     <string-array name="currencies_india">
         <item>₹ (INR)</item>
     </string-array>
 
-    <string-array name="currencies_singapore">
+<!--    <string-array name="currencies_singapore">
         <item>S$ (SGD)</item>
-    </string-array>
+    </string-array> -->
 
 </resources>

@@ -130,7 +130,7 @@ class Login : Fragment() {
     private fun updatePaymentMethodSpinner(country: String) {
         val paymentMethodsResId = when (country) {
             "India" -> R.array.payment_methods_india
-            "Singapore" -> R.array.payment_methods_singapore
+           // "Singapore" -> R.array.payment_methods_singapore
             else -> return
         }
         val paymentMethods = resources.getStringArray(paymentMethodsResId)
@@ -141,7 +141,7 @@ class Login : Fragment() {
     private fun updateCurrencySpinner(country: String) {
         val currenciesResId = when (country) {
             "India" -> R.array.currencies_india
-            "Singapore" -> R.array.currencies_singapore
+          //  "Singapore" -> R.array.currencies_singapore
             else -> return
         }
         val currencies = resources.getStringArray(currenciesResId)
