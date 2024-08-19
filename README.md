@@ -36,3 +36,18 @@ UPI and card POS system for android 4 and above.
 	- Split The Bill Works
 	
 If you know any countries that use a simple URL like India does (upi://...), pleas let me know and I can try to add support.
+
+### Original Mockup
+
+Start of the journey! [Commit](https://github.com/ZeusInstitute-OSS/UPI-Viewer/commit/c68d24024b69288a7b27d72a8c40747f7f5033fd)
+
+June 16, 2023
+
+![Mockup](https://github.com/ZeusInstitute-OSS/UPI-Viewer/assets/84176052/8373ea02-d586-4cbe-8086-56e6b384238d)
+
+### Demo
+Here's a fediverse post with a video demo of the app!
+
+Aug 18, 2024
+
+https://infosec.exchange/@sounddrill/112978269858575730
