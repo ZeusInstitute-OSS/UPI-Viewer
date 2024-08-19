@@ -77,7 +77,7 @@ jobs:
         git reset --hard
         git switch gh-pages
         mkdir -p redirects/app-updates
-        echo "<meta http-equiv=\"refresh\" content=\"0; url=https://github.com/ZeusInstitute-OSS/UPI-Viewer/releases/tag/${{ github.run_id }}\">" > redirects/app-updates/index.html
+        echo "<meta http-equiv=\"refresh\" content=\"0; url=https://github.com/ZeusInstitute-OSS/UPI-Viewer/releases/tag/${{ github.run_id }}\"/>" > redirects/app-updates/index.html
         git add redirects/app-updates/index.html
         git commit -m "Update app update redirect to version ${{ github.run_id }}"
         git push origin gh-pages
