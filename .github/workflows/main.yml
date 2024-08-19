@@ -24,6 +24,16 @@ jobs:
         git config --global user.name "sounddrill31"
         git config --global user.email "sounddrill31@gmail.com"
       id: pwd
+    - name: Versioning
+      run: |
+      if [ -z "${{ github.run_id }}" ]; then 
+        echo "Run ID is blank!"; 
+      else
+        RUN_ID="${github.run_id}"
+        sed -i '/^import/a\private val buildRunId = "'"$RUN_ID"'"' app/src/main/java/com/zeusinstitute/upiapp/Update.kt
+      fi
+      
+
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build with Gradle
@@ -65,19 +75,3 @@ jobs:
         draft: false
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Re-Configure Git
-      run: |
-        git config user.name github-actions
-        git config user.email github-actions@github.com
-
-    - name: Update gh-pages branch
-      run: |
-        git fetch
-        git reset --hard
-        git switch gh-pages
-        mkdir -p redirects/app-updates
-        echo "<meta http-equiv=\"refresh\" content=\"0; url=https://github.com/ZeusInstitute-OSS/UPI-Viewer/releases/download/${{ github.run_id }}/app-debug-signed.apk\"/>" > redirects/app-updates/index.html
-        git add redirects/app-updates/index.html
-        git commit -m "Update app update redirect to version ${{ github.run_id }}"
-        git push origin gh-pages

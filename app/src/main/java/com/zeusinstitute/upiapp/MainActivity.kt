@@ -65,6 +65,10 @@ class MainActivity : AppCompatActivity() {
                 findNavController(R.id.nav_host_fragment_content_main).navigate(R.id.action_firstFragment_to_dynamicFragment)
                 true
             }
+            R.id.Update -> {
+                findNavController(R.id.nav_host_fragment_content_main).navigate(R.id.action_firstFragment_to_Update)
+                true
+            }
             android.R.id.home -> {
                 findNavController(R.id.nav_host_fragment_content_main).navigateUp()
                 return true

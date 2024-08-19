@@ -21,6 +21,9 @@
               <action
                   android:id="@+id/action_firstFragment_to_splitBillFragment"
                   app:destination="@id/splitBillFragment" />
+              <action
+                  android:id="@+id/action_firstFragment_to_Update"
+                  app:destination="@id/Update" />
        </fragment>
        <fragment
            android:id="@+id/login"
@@ -44,4 +47,8 @@
            android:id="@+id/splitBillFragment"
            android:name="SplitBillFragment"
            android:label="Split the Bill" />
+       <fragment
+           android:id="@+id/Update"
+           android:name="com.zeusinstitute.upiapp.UpdateFragment"
+           android:label="Update"/>
 </navigation>

@@ -14,7 +14,6 @@
             <item
                 android:id="@+id/SplitBill"
                 android:title="Split The Bill" />
-
         </menu>
     </item>
     <item android:title="Hardware" ></item>
@@ -29,7 +28,9 @@
             <item
                 android:id="@+id/log_in"
                 android:title="@string/login"/>
-            <item android:title="Update" />
+            <item
+                android:id="@+id/Update"
+                android:title="Check Updates" />
             <item
                 android:enabled="true"
                 android:id="@+id/AboutApp"
