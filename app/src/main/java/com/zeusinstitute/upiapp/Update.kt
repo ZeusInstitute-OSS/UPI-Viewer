@@ -1,6 +1,7 @@
 package com.zeusinstitute.upiapp
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -10,6 +11,7 @@ import android.widget.Button
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.Dispatchers
@@ -17,6 +19,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import org.json.JSONObject
+import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
 private val buildRunId: Long = 0
@@ -26,6 +29,7 @@ class UpdateFragment : Fragment() {
     private val releasesUrl = "https://api.github.com/repos/ZeusInstitute-OSS/UPI-Viewer/releases"
 
     private lateinit var checkUpdateButton: Button
+    private lateinit var installButton: Button
     private lateinit var noUpdateText: TextView
     private lateinit var downloadProgressBar: ProgressBar
 
@@ -39,6 +43,8 @@ class UpdateFragment : Fragment() {
         noUpdateText = view.findViewById(R.id.noUpdateText)
         downloadProgressBar = view.findViewById(R.id.downloadProgressBar)
 
+        installButton = view.findViewById(R.id.installButton) // Find the install button
+        installButton.visibility = View.GONE // Initially hide the install button
 
         checkUpdateButton.setOnClickListener {
                 if (buildRunId == 0L) {
@@ -122,7 +128,10 @@ class UpdateFragment : Fragment() {
         withContext(Dispatchers.Main) {
             downloadProgressBar.visibility = View.VISIBLE
             downloadProgressBar.progress = 0
+            installButton.visibility = View.GONE // Hide the install button initially
         }
+
+        val apkFile = File(context?.filesDir, "downloaded.apk") // File to save the APK
 
         withContext(Dispatchers.IO) {
             try {
@@ -138,26 +147,39 @@ class UpdateFragment : Fragment() {
                     var bytes: Int
 
                     connection.inputStream.use { input ->
-                        while (input.read(buffer).also { bytes = it } >= 0) {
-                            bytesRead += bytes
-                            val progress = (bytesRead.toFloat() / contentLength * 100).toInt()
-                            withContext(Dispatchers.Main) {
-                                downloadProgressBar.progress = progress
+                        apkFile.outputStream().use { output ->
+                            while (input.read(buffer).also { bytes = it } >= 0) {
+                                bytesRead += bytes
+                                val progress = (bytesRead.toFloat() / contentLength * 100).toInt()
+                                withContext(Dispatchers.Main) {
+                                    downloadProgressBar.progress = progress
+                                }
+                                output.write(buffer, 0, bytes)
                             }
                         }
                     }
 
-                    // Here you would save the APK and initiate the installation
-                    android.util.Log.i(TAG, "APK downloaded successfully")
+                    // APK downloaded successfully, show install button
+                    withContext(Dispatchers.Main) {
+                        if (apkFile.exists()) {
+                            installButton.visibility = View.VISIBLE
+                            installButton.setOnClickListener {
+                                installApk(apkFile)
+                            }
+                        } else {
+                            noUpdateText.text = "Update failed: Downloaded file not found"
+                            noUpdateText.visibility = View.VISIBLE
+                        }
+                    }
                 } else {
-                    android.util.Log.e(TAG, "HTTP error: ${connection.responseCode}")
+                    Log.e(TAG, "HTTP error: ${connection.responseCode}")
                     withContext(Dispatchers.Main) {
                         noUpdateText.text = "Update failed: HTTP ${connection.responseCode}"
                         noUpdateText.visibility = View.VISIBLE
                     }
                 }
             } catch (e: Exception) {
-                android.util.Log.e(TAG, "Error downloading APK", e)
+                Log.e(TAG, "Error downloading APK", e)
                 withContext(Dispatchers.Main) {
                     noUpdateText.text = "Update failed: ${e.message}"
                     noUpdateText.visibility = View.VISIBLE
@@ -169,6 +191,27 @@ class UpdateFragment : Fragment() {
             downloadProgressBar.visibility = View.GONE
             checkUpdateButton.isEnabled = true
         }
+    }
+
+    private fun installApk(apkFile: File) {
+        val context = context ?: return // Ensure context is available
+
+        // Use FileProvider to get a content URI for the APK file
+        val apkUri = FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.fileprovider", // Replace with your FileProvider authority
+            apkFile
+        )
+
+        // Create an intent to launch the package installer
+        val intent = Intent(Intent.ACTION_VIEW).apply {
+            setDataAndType(apkUri, "application/vnd.android.package-archive")
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION) // Grant read permission
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK) // Launch in a new task
+        }
+
+        // Start the package installer activity
+        startActivity(intent)
     }
 
     data class Release(val runId: Long, val apkUrl: String)
