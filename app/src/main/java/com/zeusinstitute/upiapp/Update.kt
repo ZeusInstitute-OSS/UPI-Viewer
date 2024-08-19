@@ -16,6 +16,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.json.JSONArray
+import org.json.JSONObject
 import java.net.HttpURLConnection
 import java.net.URL
 private val buildRunId: Long = 0
@@ -89,26 +90,23 @@ class UpdateFragment : Fragment() {
     }
 
     private suspend fun getLatestRelease(): Release? {
+        val latestReleaseUrl = "https://api.github.com/repos/ZeusInstitute-OSS/UPI-Viewer/releases/latest"
+
         return withContext(Dispatchers.IO) {
             try {
-                val connection = URL(releasesUrl).openConnection() as HttpURLConnection
+                val connection = URL(latestReleaseUrl).openConnection() as HttpURLConnection
                 connection.requestMethod = "GET"
-                connection.setRequestProperty("Accept", "application/vnd.github+json") // Specify GitHub API version
+                connection.setRequestProperty("Accept", "application/vnd.github+json")
 
                 val responseCode = connection.responseCode
                 if (responseCode == HttpURLConnection.HTTP_OK) {
                     val response = connection.inputStream.bufferedReader().use { it.readText() }
-                    val jsonArray = JSONArray(response)
+                    val jsonObject = JSONObject(response) // Parse the JSON response
 
-                    if (jsonArray.length() > 0) {
-                        val latestRelease = jsonArray.getJSONObject(0)
-                        val runId = latestRelease.getLong("id")
-                        val tagName = latestRelease.getString("tag_name") // Get tag name for APK URL
-                        val apkUrl = "https://github.com/ZeusInstitute-OSS/UPI-Viewer/releases/download/$tagName/app-debug-signed.apk"
-                        Release(runId, apkUrl)
-                    } else {
-                        null
-                    }
+                    val runId = jsonObject.getLong("id")
+                    val tagName = jsonObject.getString("tag_name")
+                    val apkUrl = "https://github.com/ZeusInstitute-OSS/UPI-Viewer/releases/download/$tagName/app-debug-signed.apk"
+                    Release(runId, apkUrl)
                 } else {
                     Log.e(TAG, "Error getting latest release: HTTP $responseCode")
                     null
@@ -119,6 +117,7 @@ class UpdateFragment : Fragment() {
             }
         }
     }
+
     private suspend fun downloadApk(url: String) {
         withContext(Dispatchers.Main) {
             downloadProgressBar.visibility = View.VISIBLE
