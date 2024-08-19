@@ -1,5 +1,6 @@
 package com.zeusinstitute.upiapp
 
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -209,7 +210,12 @@ class UpdateFragment : Fragment() {
         }
 
         // Start the package installer activity
-        startActivity(intent)
+        try {
+            startActivity(intent)
+        } catch (e: ActivityNotFoundException) {
+            Log.e(TAG, "No activity found to handle APK installation", e)
+            // Display an error message to the user
+        }
     }
 
     data class Release(val runId: Long, val apkUrl: String)
