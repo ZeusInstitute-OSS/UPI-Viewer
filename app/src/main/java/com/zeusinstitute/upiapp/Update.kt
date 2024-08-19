@@ -67,7 +67,7 @@ class UpdateFragment : Fragment() {
                 downloadApk(latestRelease.apkUrl)
             } else if (latestRelease.runId == buildRunId) {
                 withContext(Dispatchers.Main) {
-                    noUpdateText.text = "Already on Latest Build"
+                    noUpdateText.text = "Already on Latest Build $latestRelease.runId"
                     noUpdateText.visibility = View.VISIBLE
                     checkUpdateButton.isEnabled = true
                 }
@@ -75,14 +75,14 @@ class UpdateFragment : Fragment() {
                 // Handle the case where the latest release has a lower runId
                 // (this might indicate an issue with your release numbering)
                 withContext(Dispatchers.Main) {
-                    noUpdateText.text = "Unexpected version found"
+                    noUpdateText.text = "Unexpected version found $latestRelease.runId"
                     noUpdateText.visibility = View.VISIBLE
                     checkUpdateButton.isEnabled = true
                 }
             }
         } else {
             withContext(Dispatchers.Main) {
-                noUpdateText.text = "No updates available"
+                noUpdateText.text = "No updates available for $buildRunId"
                 noUpdateText.visibility = View.VISIBLE
                 checkUpdateButton.isEnabled = true
             }
@@ -101,12 +101,12 @@ class UpdateFragment : Fragment() {
                 val responseCode = connection.responseCode
                 if (responseCode == HttpURLConnection.HTTP_OK) {
                     val response = connection.inputStream.bufferedReader().use { it.readText() }
-                    val jsonObject = JSONObject(response) // Parse the JSON response
+                    val jsonObject = JSONObject(response)
 
-                    val runId = jsonObject.getLong("id")
-                    val tagName = jsonObject.getString("tag_name")
+                    val tagName = jsonObject.getString("tag_name") // Get the tag name
+                    val runIdLong = tagName.toLongOrNull() ?: 0L
                     val apkUrl = "https://github.com/ZeusInstitute-OSS/UPI-Viewer/releases/download/$tagName/app-debug-signed.apk"
-                    Release(runId, apkUrl)
+                    Release(runIdLong, apkUrl) // Pass tag name as runId
                 } else {
                     Log.e(TAG, "Error getting latest release: HTTP $responseCode")
                     null
