@@ -1,5 +1,3 @@
-package com.zeusinstitute.upiapp
-
 import android.content.Context
 import android.graphics.Bitmap
 import android.os.Bundle
@@ -16,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.WriterException
 import com.journeyapps.barcodescanner.BarcodeEncoder
+import com.zeusinstitute.upiapp.R
 
 data class PayeeData(val amount: Int, val qrCode: Bitmap?, val payeeNumber: Int)
 
