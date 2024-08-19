@@ -73,10 +73,11 @@ jobs:
 
     - name: Update gh-pages branch
       run: |
-        git clone https://${{ secrets.GITHUB_TOKEN }}@github.com/ZeusInstitute-OSS/UPI-Viewer -b gh-pages
-        cd UPI-Viewer
+        git fetch
+        git reset --hard
+        git switch gh-pages
         mkdir -p redirects/app-updates
         echo "<meta http-equiv=\"refresh\" content=\"0; url=${{ github.event.release.assets[0].browser_download_url }}\">" > redirects/app-updates/index.html
         git add redirects/app-updates/index.html
         git commit -m "Update app update redirect to version ${{ github.run_id }}"
-        git push https://${{ secrets.GITHUB_TOKEN }}@github.com/ZeusInstitute-OSS/UPI-Viewer.git gh-pages
+        git push origin gh-pages
