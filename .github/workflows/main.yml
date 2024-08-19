@@ -65,3 +65,17 @@ jobs:
         draft: false
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Re-Configure Git
+      run: |
+        git config user.name github-actions
+        git config user.email github-actions@github.com
+
+    - name: Update gh-pages branch
+      run: |
+        git checkout gh-pages
+        mkdir -p redirects/app-updates
+        echo "<meta http-equiv=\"refresh\" content=\"0; url="https://github.com/ZeusInstitute-OSS/UPI-Viewer/releases/tag/${{ github.run_id }}">" > redirects/app-updates/index.html
+        git add redirects/app-updates/index.html
+        git commit -m "Update app update redirect to version ${{ github.run_id }}"
+        git push origin gh-pages
