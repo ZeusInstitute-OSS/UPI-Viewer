@@ -24,15 +24,10 @@ jobs:
         git config --global user.name "sounddrill31"
         git config --global user.email "sounddrill31@gmail.com"
       id: pwd
+
     - name: Versioning
-      run: |
-      if [ -z "${{ github.run_id }}" ]; then 
-        echo "Run ID is blank!"; 
-      else
-        RUN_ID="${github.run_id}"
-        sed -i '/^import/a\private val buildRunId = "'"$RUN_ID"'"' app/src/main/java/com/zeusinstitute/upiapp/Update.kt
-      fi
-      
+      run: sed -i "s/private val buildRunId: Long = 0/private val buildRunId: Long = ${{ github.run_id }}/" app/src/main/java/com/zeusinstitute/upiapp/UpdateFragment.kt
+        grep "private val buildRunId" app/src/main/java/com/zeusinstitute/upiapp/UpdateFragment.kt
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
