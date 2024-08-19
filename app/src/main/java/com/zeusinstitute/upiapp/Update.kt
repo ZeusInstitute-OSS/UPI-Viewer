@@ -18,7 +18,7 @@ import kotlinx.coroutines.withContext
 import org.json.JSONArray
 import java.net.HttpURLConnection
 import java.net.URL
-private val buildRunId: Long = 10448859905
+private val buildRunId: Long = 0
 
 class UpdateFragment : Fragment() {
     private val TAG = "UpdateFragment"
@@ -39,7 +39,7 @@ class UpdateFragment : Fragment() {
         downloadProgressBar = view.findViewById(R.id.downloadProgressBar)
 
 
-            checkUpdateButton.setOnClickListener {
+        checkUpdateButton.setOnClickListener {
                 if (buildRunId == 0L) {
                     Toast.makeText(context, "Updating is disabled", Toast.LENGTH_SHORT).show()
                 } else {
@@ -48,8 +48,6 @@ class UpdateFragment : Fragment() {
                     }
                 }
             }
-
-
 
         return view
     }
@@ -63,8 +61,24 @@ class UpdateFragment : Fragment() {
 
         val latestRelease = getLatestRelease()
 
-        if (latestRelease != null && latestRelease.runId > buildRunId) {
-            downloadApk(latestRelease.apkUrl)
+        if (latestRelease != null) {
+            if (latestRelease.runId > buildRunId) {
+                downloadApk(latestRelease.apkUrl)
+            } else if (latestRelease.runId == buildRunId) {
+                withContext(Dispatchers.Main) {
+                    noUpdateText.text = "Already on Latest Build"
+                    noUpdateText.visibility = View.VISIBLE
+                    checkUpdateButton.isEnabled = true
+                }
+            } else {
+                // Handle the case where the latest release has a lower runId
+                // (this might indicate an issue with your release numbering)
+                withContext(Dispatchers.Main) {
+                    noUpdateText.text = "Unexpected version found"
+                    noUpdateText.visibility = View.VISIBLE
+                    checkUpdateButton.isEnabled = true
+                }
+            }
         } else {
             withContext(Dispatchers.Main) {
                 noUpdateText.text = "No updates available"
