@@ -27,8 +27,8 @@ jobs:
 
     - name: Versioning
       run: |
-        sed -i "s/private val buildRunId: Long = 0/private val buildRunId: Long = ${{ github.run_id }}/" app/src/main/java/com/zeusinstitute/upiapp/UpdateFragment.kt
-        grep "private val buildRunId" app/src/main/java/com/zeusinstitute/upiapp/UpdateFragment.kt
+        sed -i "s/private val buildRunId: Long = 0/private val buildRunId: Long = ${{ github.run_id }}/" app/src/main/java/com/zeusinstitute/upiapp/Update.kt
+        grep "private val buildRunId" app/src/main/java/com/zeusinstitute/upiapp/Update.kt
 
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
