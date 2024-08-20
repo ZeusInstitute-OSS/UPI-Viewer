@@ -1,9 +1,15 @@
 package com.zeusinstitute.upiapp
 
+import SMSService
+import android.content.Context
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.core.content.ContextCompat.startForegroundService
 import androidx.core.view.WindowCompat
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -25,25 +31,19 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         appBarConfiguration = AppBarConfiguration(navController.graph)
         setupActionBarWithNavController(navController, appBarConfiguration)
+
+        // Start SMS service if enabled
+        val sharedPref = getPreferences(Context.MODE_PRIVATE)
+        val smsEnabled = sharedPref.getBoolean("sms_enabled", true)
+        if (smsEnabled) {
+            startSMSService()
+        }
     }
-
-    /*override fun onPrepareOptionsMenu(menu: Menu): Boolean {
-        // Check if the top-most fragment is NOT FirstFragment
-        val isNotFirstFragmentOpen = supportFragmentManager.findFragmentById(R.id.nav_host_fragment_content_main)?.childFragmentManager?.fragments?.lastOrNull() !is FirstFragment
-
-        // Set the visibility of the entire menu
-        menu.setGroupVisible(0, !isNotFirstFragmentOpen)
-
-        return super.onPrepareOptionsMenu(menu)
-    }*/
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_main, menu)
         return true
-
-        // Initially hide the entire menu
-        //menu.setGroupVisible(0, false)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -76,4 +76,16 @@ class MainActivity : AppCompatActivity() {
             else -> super.onOptionsItemSelected(item)
         }
     }
+    private fun startSMSService() {
+        val intent = Intent(this, SMSService::class.java)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // For Android 8.0 and above
+            startForegroundService(this, intent)
+        } else {
+            // For older Android versions (Jelly Bean and KitKat)
+            ContextCompat.startForegroundService(this, intent)
+        }
+    }
+
 }
+

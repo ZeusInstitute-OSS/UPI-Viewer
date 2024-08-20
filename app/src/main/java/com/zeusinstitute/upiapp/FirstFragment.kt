@@ -21,6 +21,8 @@ import com.zeusinstitute.upiapp.databinding.FragmentFirstBinding
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
  */
+
+
 class FirstFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListener {
 
     private var _binding: FragmentFirstBinding? = null
@@ -28,7 +30,6 @@ class FirstFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeList
     private lateinit var qrCodeImageView: ImageView
     private lateinit var sharedPref: SharedPreferences
     private lateinit var paymentMethod: String
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?

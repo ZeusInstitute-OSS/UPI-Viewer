@@ -2,7 +2,10 @@
 
 package com.zeusinstitute.upiapp
 
+import SMSService
 import android.content.Context
+import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -12,6 +15,7 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.widget.*
 import android.view.inputmethod.InputMethodManager
+import androidx.appcompat.widget.SwitchCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -25,6 +29,7 @@ class Login : Fragment() {
     private lateinit var apikeyLayout: TextInputLayout
     private lateinit var apikey: TextInputEditText
     private lateinit var rulesTextView: TextView
+    private lateinit var smsSwitch: SwitchCompat
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,10 +40,12 @@ class Login : Fragment() {
         apikeyLayout = view.findViewById(R.id.apikeyLayout)
         apikey = view.findViewById(R.id.apikey)
         val submitButton = view.findViewById<Button>(R.id.submitButton)
-        rulesTextView = view.findViewById(R.id.rulesTextView)
+                rulesTextView = view.findViewById(R.id.rulesTextView)
 
-        countrySpinner = view.findViewById(R.id.countrySpinner)
-        paymentMethodSpinner = view.findViewById(R.id.paymentMethodSpinner)
+                smsSwitch = view.findViewById(R.id.smsSwitch)
+
+                countrySpinner = view.findViewById(R.id.countrySpinner)
+                paymentMethodSpinner = view.findViewById(R.id.paymentMethodSpinner)
         currencySpinner = view.findViewById(R.id.currencySpinner)
 
         setupSpinners()
@@ -67,7 +74,8 @@ class Login : Fragment() {
                 apikey.requestFocus()
 
                 // Hide Keyboard
-                val imm = ContextCompat.getSystemService(requireContext(), InputMethodManager::class.java)
+                val imm =
+                    ContextCompat.getSystemService(requireContext(), InputMethodManager::class.java)
                 imm?.hideSoftInputFromWindow(apikey.windowToken, 0)
                 true
             } else {
@@ -79,6 +87,10 @@ class Login : Fragment() {
             handleSubmit()
         }
 
+        // Load the current SMS notification state
+        val sharedPref = requireActivity().getPreferences(Context.MODE_PRIVATE)
+        val smsEnabled = sharedPref.getBoolean("sms_enabled", true)
+        smsSwitch.isChecked = smsEnabled
         return view
     }
 
@@ -86,11 +98,17 @@ class Login : Fragment() {
     private fun setupSpinners() {
         // Set up country spinner
         val countries = resources.getStringArray(R.array.countries)
-        val countryAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, countries)
+        val countryAdapter =
+            ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, countries)
         countrySpinner.adapter = countryAdapter
 
         countrySpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
                 val selectedCountry = countries[position]
                 updatePaymentMethodSpinner(selectedCountry)
                 updateCurrencySpinner(selectedCountry)
@@ -101,7 +119,12 @@ class Login : Fragment() {
 
         // Set up payment method spinner listener
         paymentMethodSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+            override fun onItemSelected(
+                parent: AdapterView<*>?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
                 val selectedPaymentMethod = parent?.getItemAtPosition(position).toString()
                 updateUIForPaymentMethod(selectedPaymentMethod)
             }
@@ -121,29 +144,31 @@ class Login : Fragment() {
             //apikey.hint = "Enter UPI ID"
         } else {
             rulesTextView.visibility = View.GONE
-           //apikey.hint = "Enter Payment ID"
+            //apikey.hint = "Enter Payment ID"
         }
     }
 
     private fun updatePaymentMethodSpinner(country: String) {
         val paymentMethodsResId = when (country) {
             "India" -> R.array.payment_methods_india
-           // "Singapore" -> R.array.payment_methods_singapore
+            // "Singapore" -> R.array.payment_methods_singapore
             else -> return
         }
         val paymentMethods = resources.getStringArray(paymentMethodsResId)
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, paymentMethods)
+        val adapter =
+            ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, paymentMethods)
         paymentMethodSpinner.adapter = adapter
     }
 
     private fun updateCurrencySpinner(country: String) {
         val currenciesResId = when (country) {
             "India" -> R.array.currencies_india
-          //  "Singapore" -> R.array.currencies_singapore
+            //  "Singapore" -> R.array.currencies_singapore
             else -> return
         }
         val currencies = resources.getStringArray(currenciesResId)
-        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, currencies)
+        val adapter =
+            ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, currencies)
         currencySpinner.adapter = adapter
     }
 
@@ -152,6 +177,7 @@ class Login : Fragment() {
         val country = countrySpinner.selectedItem.toString()
         val paymentMethod = paymentMethodSpinner.selectedItem.toString()
         val currency = currencySpinner.selectedItem.toString()
+        val smsEnabled = smsSwitch.isChecked
 
         if (paymentMethod == "UPI") {
             val invalidReasons = getInvalidUpiIdReasons(data)
@@ -161,18 +187,42 @@ class Login : Fragment() {
             }
         }
 
-        // Save data to Shared Preferences
-        val sharedPref = requireActivity().getPreferences(Context.MODE_PRIVATE) ?: return
-        with (sharedPref.edit()) {
+        val sharedPref = requireActivity().getPreferences(Context.MODE_PRIVATE)
+        with(sharedPref.edit()) {
             putString("saved_data", data)
             putString("country", country)
             putString("payment_method", paymentMethod)
             putString("currency", currency)
+            putBoolean("sms_enabled", smsEnabled)
             apply()
+        }
+
+        // Toggle SMS service based on switch state
+        if (smsEnabled) {
+            startSMSService()
+        } else {
+            stopSMSService()
         }
 
         // Navigate back to FirstFragment
         findNavController().navigate(R.id.action_login_to_firstFragment)
+    }
+
+    private fun startSMSService() {
+        val intent = Intent(requireContext(), SMSService::class.java)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            requireContext().startForegroundService(intent)
+        } else {
+            requireActivity().startService(intent) // For older Android versions
+        }
+    }
+
+    private fun stopSMSService() {
+        // You don't stop the service directly from the fragment anymore
+        // Instead, send a broadcast to the service to tell it to stop itself
+        val intent = Intent(requireContext(), SMSService::class.java)
+        intent.action = "STOP_SERVICE" // Define an action to stop the service
+        requireContext().sendBroadcast(intent)
     }
 
     private fun getInvalidUpiIdReasons(upiId: String): List<String> {
