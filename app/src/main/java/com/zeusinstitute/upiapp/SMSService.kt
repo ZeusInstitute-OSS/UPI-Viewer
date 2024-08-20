@@ -79,8 +79,7 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
     }
 
     private fun processMessage(message: String) {
-        val sharedPref =
-            getSharedPreferences("com.zeusinstitute.upiapp.preferences", Context.MODE_PRIVATE)
+        val sharedPref = getSharedPreferences("com.zeusinstitute.upiapp.preferences", Context.MODE_PRIVATE)
         val smsEnabled = sharedPref.getBoolean("sms_enabled", true)
 
         Log.d("SMSService", "Processing message: $message")
