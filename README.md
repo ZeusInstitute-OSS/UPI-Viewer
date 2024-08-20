@@ -26,7 +26,7 @@ UPI and card POS system for android 4 and above.
 10. Support addon hardware : ❌
 11. Other Countries : *️⃣
 12. A Bill Handling System for Payment History : ❌
-13. SMS Payment Read-Aloud : ❌
+13. SMS Payment Read-Aloud : *️⃣
 14. Retail Mode With USB/Network PC Support : ❌
 
 ### Supported Countries:
