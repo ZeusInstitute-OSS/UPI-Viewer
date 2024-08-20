@@ -55,6 +55,7 @@
         </activity>
         <service
             android:name=".SMSService"
+            android:enabled="true"
             android:exported="false" />
     </application>
 </manifest>

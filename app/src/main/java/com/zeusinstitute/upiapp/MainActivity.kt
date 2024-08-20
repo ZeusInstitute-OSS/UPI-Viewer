@@ -1,6 +1,5 @@
 package com.zeusinstitute.upiapp
 
-import SMSService
 import android.content.Context
 import android.content.Intent
 import android.os.Build

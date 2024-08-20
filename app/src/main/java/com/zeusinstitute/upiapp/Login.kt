@@ -2,13 +2,15 @@
 
 package com.zeusinstitute.upiapp
 
-import SMSService
+import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +18,7 @@ import android.view.inputmethod.EditorInfo
 import android.widget.*
 import android.view.inputmethod.InputMethodManager
 import androidx.appcompat.widget.SwitchCompat
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -31,6 +34,8 @@ class Login : Fragment() {
     private lateinit var rulesTextView: TextView
     private lateinit var smsSwitch: SwitchCompat
 
+    private val SMS_PERMISSION_REQUEST_CODE = 101
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -40,12 +45,14 @@ class Login : Fragment() {
         apikeyLayout = view.findViewById(R.id.apikeyLayout)
         apikey = view.findViewById(R.id.apikey)
         val submitButton = view.findViewById<Button>(R.id.submitButton)
-                rulesTextView = view.findViewById(R.id.rulesTextView)
+        rulesTextView = view.findViewById(R.id.rulesTextView)
 
-                smsSwitch = view.findViewById(R.id.smsSwitch)
+        // Prepare smsSwitch
+        smsSwitch = view.findViewById(R.id.smsSwitch)
+        initializeSmsToggle()
 
-                countrySpinner = view.findViewById(R.id.countrySpinner)
-                paymentMethodSpinner = view.findViewById(R.id.paymentMethodSpinner)
+        countrySpinner = view.findViewById(R.id.countrySpinner)
+        paymentMethodSpinner = view.findViewById(R.id.paymentMethodSpinner)
         currencySpinner = view.findViewById(R.id.currencySpinner)
 
         setupSpinners()
@@ -88,12 +95,48 @@ class Login : Fragment() {
         }
 
         // Load the current SMS notification state
-        val sharedPref = requireActivity().getPreferences(Context.MODE_PRIVATE)
-        val smsEnabled = sharedPref.getBoolean("sms_enabled", true)
-        smsSwitch.isChecked = smsEnabled
+        // val sharedPref = requireActivity().getPreferences(Context.MODE_PRIVATE)
+        //val smsEnabled = sharedPref.getBoolean("sms_enabled", true)
+        //smsSwitch.isChecked = smsEnabled
         return view
     }
+    private fun initializeSmsToggle() {
+        val sharedPref = requireActivity().getPreferences(Context.MODE_PRIVATE)
+        val isFirstTime = sharedPref.getBoolean("first_time", true)
 
+        if (isFirstTime) {
+            // First time opening the app, set default and mark as not first time
+            smsSwitch.isChecked = false
+            sharedPref.edit().putBoolean("first_time", false).apply()
+        } else {
+            // Not first time, load state from SharedPreferences
+            smsSwitch.isChecked = sharedPref.getBoolean("sms_enabled", false)
+        }
+
+        smsSwitch.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.RECEIVE_SMS), SMS_PERMISSION_REQUEST_CODE)
+                } else {
+                    enableSmsService()
+                }
+            } else {
+                disableSmsService()
+            }
+        }
+    }
+
+    private fun enableSmsService() {
+        val sharedPref = requireActivity().getPreferences(Context.MODE_PRIVATE)
+        sharedPref.edit().putBoolean("sms_enabled", true).apply()
+        startSMSService()
+    }
+
+    private fun disableSmsService() {
+        val sharedPref = requireActivity().getPreferences(Context.MODE_PRIVATE)
+        sharedPref.edit().putBoolean("sms_enabled", false).apply()
+        stopSMSService()
+    }
 
     private fun setupSpinners() {
         // Set up country spinner
@@ -200,8 +243,10 @@ class Login : Fragment() {
         // Toggle SMS service based on switch state
         if (smsEnabled) {
             startSMSService()
+            Log.d("SMSService", "SMS is enabled. Starting Service...")
         } else {
             stopSMSService()
+            Log.d("SMSService", "SMS is not enabled. Stopping Service...")
         }
 
         // Navigate back to FirstFragment
@@ -218,12 +263,28 @@ class Login : Fragment() {
     }
 
     private fun stopSMSService() {
-        // You don't stop the service directly from the fragment anymore
-        // Instead, send a broadcast to the service to tell it to stop itself
         val intent = Intent(requireContext(), SMSService::class.java)
         intent.action = "STOP_SERVICE" // Define an action to stop the service
         requireContext().sendBroadcast(intent)
     }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+        when (requestCode) {
+            SMS_PERMISSION_REQUEST_CODE -> {
+                if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                    enableSmsService()
+                } else {
+                    // Permission denied, disable the switch
+                    smsSwitch.isChecked = false
+                }
+                return
+            }
+            else -> {
+                // Handle other permission requests if needed
+            }
+        }
+    }
+
 
     private fun getInvalidUpiIdReasons(upiId: String): List<String> {
         val reasons = mutableListOf<String>()
