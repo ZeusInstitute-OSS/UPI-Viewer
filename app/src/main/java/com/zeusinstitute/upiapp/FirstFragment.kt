@@ -10,6 +10,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.Spinner
+import android.widget.TextView
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
@@ -21,6 +23,8 @@ import com.zeusinstitute.upiapp.databinding.FragmentFirstBinding
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
  */
+
+
 class FirstFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeListener {
 
     private var _binding: FragmentFirstBinding? = null
@@ -28,6 +32,7 @@ class FirstFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeList
     private lateinit var qrCodeImageView: ImageView
     private lateinit var sharedPref: SharedPreferences
     private lateinit var paymentMethod: String
+    private lateinit var smsStatusTextView: TextView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,6 +40,7 @@ class FirstFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeList
     ): View? {
         _binding = FragmentFirstBinding.inflate(inflater, container, false)
         qrCodeImageView = binding.qrCodeImageView
+        smsStatusTextView = binding.smsStatusTextView
 
         // Make status bar transparent (conditionally for Lollipop and above)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -42,7 +48,6 @@ class FirstFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeList
             window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
             window.statusBarColor = Color.TRANSPARENT
         }
-
         return binding.root
     }
 
@@ -53,11 +58,15 @@ class FirstFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeList
         sharedPref.registerOnSharedPreferenceChangeListener(this) // Register listener
 
         updateQRCode() // Generate QR code initially
+        updateSmsStatus()
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         if (key == "saved_data") {
             updateQRCode() // Regenerate QR code when "saved_data" changes
+        }
+        if (key == "sms_enabled") {
+            updateSmsStatus() // Check if SMS reading is enabled
         }
     }
 
@@ -97,5 +106,11 @@ class FirstFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeList
             window.statusBarColor = Color.TRANSPARENT // or any other color you want
         }
         _binding = null
+    }
+
+    private fun updateSmsStatus() {
+        val smsEnabled = sharedPref.getBoolean("sms_enabled", false)
+        smsStatusTextView.text = if (smsEnabled) "Speaker Mode Enabled" else ""
+        smsStatusTextView.visibility = if (smsEnabled) View.VISIBLE else View.GONE
     }
 }
