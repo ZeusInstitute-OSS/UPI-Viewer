@@ -79,7 +79,8 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
     }
 
     private fun processMessage(message: String) {
-        val sharedPref = getSharedPreferences("com.zeusinstitute.upiapp.preferences", Context.MODE_PRIVATE)
+        val sharedPref =
+            getSharedPreferences("com.zeusinstitute.upiapp.preferences", Context.MODE_PRIVATE)
         val smsEnabled = sharedPref.getBoolean("sms_enabled", true)
 
         Log.d("SMSService", "Processing message: $message")
@@ -91,6 +92,24 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
         }
 
         if (message.contains("credited") && !message.contains("debited") && !message.contains("credited to")) {
+            val regex = "Rs\\.?\\s*(\\d+(\\.\\d{2})?)".toRegex() // Match Rs or Rs.
+            val matchResult = regex.find(message)
+            matchResult?.let {
+                val amount = it.groupValues[1]
+                val announcementMessage = "Received Rupees $amount"
+                Log.d("SMSService", "Queueing message: $announcementMessage")
+                messageQueue.offer(announcementMessage)
+            } ?: Log.d("SMSService", "No amount found in the message")
+        } else if (message.contains("debited")) {
+            val regex = "Rs\\.?\\s*(\\d+(\\.\\d{2})?)".toRegex() // Match Rs or Rs.
+            val matchResult = regex.find(message)
+            matchResult?.let {
+                val amount = it.groupValues[1]
+                val announcementMessage = "Sent Rupees $amount"
+                Log.d("SMSService", "Queueing message: $announcementMessage")
+                messageQueue.offer(announcementMessage)
+            } ?: Log.d("SMSService", "No amount found in the message")
+        } else if (message.contains("credited") && message.contains("credited to")) {
             val regex = "Rs\\.?\\s*(\\d+(\\.\\d{2})?)".toRegex() // Match Rs or Rs.
             val matchResult = regex.find(message)
             matchResult?.let {
