@@ -14,7 +14,7 @@ UPI and card POS system for android 4 and above.
 
 
 ### Basic prototype:
-1. SMS TTS(send/receive) : *️⃣
+1. SMS TTS(send/receive) : ✅ (Needs Testing on Pre-Oreo Devices, works well on newer phones) 
 2. QR Scanning: ✅
 3. Dynamic QR With Price : ✅
 4. Split the Bill mode : ✅
@@ -25,9 +25,8 @@ UPI and card POS system for android 4 and above.
 9. SemVer Releases : ❌
 10. Support addon hardware : ❌
 11. Other Countries : *️⃣
-12. A Bill Handling System for Payment History : ❌
-13. SMS Payment Read-Aloud : *️⃣
-14. Retail Mode With USB/Network PC Support : ❌
+12. A Bill Handling System for Payment History : *️⃣
+13. Retail Mode With USB/Network PC Support : ❌
 
 ### Supported Countries:
 1. India
