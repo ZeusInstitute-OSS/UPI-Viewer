@@ -264,8 +264,7 @@ class Login : Fragment() {
 
     private fun stopSMSService() {
         val intent = Intent(requireContext(), SMSService::class.java)
-        intent.action = "STOP_SERVICE" // Define an action to stop the service
-        requireContext().sendBroadcast(intent)
+        requireContext().stopService(intent)
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {

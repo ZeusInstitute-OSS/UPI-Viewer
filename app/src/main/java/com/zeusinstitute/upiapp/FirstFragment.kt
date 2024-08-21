@@ -61,6 +61,11 @@ class FirstFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeList
         updateSmsStatus()
     }
 
+    override fun onResume() {
+        super.onResume()
+        updateSmsStatus()
+    }
+
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         if (key == "saved_data") {
             updateQRCode() // Regenerate QR code when "saved_data" changes
@@ -109,6 +114,7 @@ class FirstFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeList
     }
 
     private fun updateSmsStatus() {
+        val sharedPref = requireActivity().getPreferences(Context.MODE_PRIVATE)
         val smsEnabled = sharedPref.getBoolean("sms_enabled", false)
         smsStatusTextView.text = if (smsEnabled) "Speaker Mode Enabled" else ""
         smsStatusTextView.visibility = if (smsEnabled) View.VISIBLE else View.GONE
