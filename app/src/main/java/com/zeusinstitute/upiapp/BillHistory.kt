@@ -24,6 +24,7 @@ import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
 import com.zeusinstitute.upiapp.PayTransaction
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 
@@ -154,7 +155,7 @@ class BillHistory : Fragment() {
         lifecycleScope.launch {
             val db = (requireContext().applicationContext as UPIAPP).database // Get centralized database
             val transactionDao = db.transactionDao()
-            val transactions = withContext(Dispatchers.IO) { transactionDao.getAllTransactions() }
+            val transactions = withContext(Dispatchers.IO) { transactionDao.getAllTransactionsOrderedByDate().first() }
             adapter.submitList(transactions)
             Log.d("BillHistory", "Fetched ${transactions.size} transactions")
             if (transactions.isEmpty()) {

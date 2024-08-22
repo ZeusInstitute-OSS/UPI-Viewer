@@ -18,4 +18,7 @@ interface TransactionDao {
 
     @Query("SELECT * FROM PayTransaction")
     fun getAllTransactions(): List<PayTransaction>
+
+    @Query("SELECT * FROM PayTransaction ORDER BY date DESC")
+    fun getAllTransactionsOrderedByDate(): Flow<List<PayTransaction>>
 }

@@ -125,22 +125,9 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
         val matchResult = regex.find(message)
 
         var extractedName: String? = null
-
-        if (message.contains('@')) {
-            val atIndex = message.indexOf('@')
-            val spaceBeforeAt = message.lastIndexOf(' ', atIndex)
-            extractedName = message.substring(spaceBeforeAt + 1, message.indexOf(' ', atIndex + 1))
-        } else {
-            val fromIndex = message.indexOf("from")
-            if (fromIndex != -1) {
-                extractedName = message.substring(fromIndex + 5).trim().split(" ")[0]
-            } else {
-                val FromIndex = message.indexOf("From")
-                if (FromIndex != -1) {
-                    extractedName = message.substring(FromIndex + 5).trim().split(" ")[0]
-                }
-            }
-        }
+        val nameRegex = "(?i)(?:from|From|FROM)\\s+(.*?)(?:\\.|thru|through)".toRegex()
+        val nameMatchResult = nameRegex.find(message)
+        extractedName = nameMatchResult?.groupValues?.getOrNull(1)?.trim()
 
         matchResult?.let { result ->
             val amount = result.groupValues[1].toDoubleOrNull()
@@ -155,11 +142,11 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
                 }
 
                 val date = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
-                val transaction = PayTransaction(amount = amount, type = type, date = date, name = extractedName.toString())
+                val transaction = PayTransaction(amount = amount, type = type, date = date, name = extractedName ?: "") // Use empty string if name is null
 
                 scope.launch {
-                    transactionDao.insert(transaction) // Insert using Room
-                    Log.d("SMSService", "Inserted transaction into database: $transaction") // Log insertion
+                    transactionDao.insert(transaction)
+                    Log.d("SMSService", "Inserted transaction into database: $transaction")
                 }
 
                 val announcementMessage = "${if (type == "Credit") "Received" else "Sent"} Rupees $amount"
