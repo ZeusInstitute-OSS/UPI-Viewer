@@ -22,7 +22,6 @@ import androidx.room.*
 import java.text.SimpleDateFormat
 
 
-
 class SMSService : Service(), TextToSpeech.OnInitListener {
     private var tts: TextToSpeech? = null
     private val messageQueue = LinkedBlockingQueue<String>()
@@ -31,7 +30,7 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
     private val notificationId = 1
     private val notificationChannelId = "sms_service_channel"
     private lateinit var notificationManager: NotificationManager
-    private lateinit var transactionBox: Box<Transaction>
+    lateinit var transactionDao: TransactionDao
 
     companion object {
         const val STOP_SERVICE = "STOP_SERVICE"
@@ -40,15 +39,28 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
     private val smsReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent?.action == Telephony.Sms.Intents.SMS_RECEIVED_ACTION) {
-                val messages = Telephony.Sms.Intents.getMessagesFromIntent(intent)
-                messages?.forEach { smsMessage ->
-                    val messageBody = smsMessage.messageBody
-                    processMessage(messageBody)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    // For KitKat and above, use the bundled SMS API
+                    val smsMessages = Telephony.Sms.Intents.getMessagesFromIntent(intent)
+                    smsMessages?.forEach { smsMessage ->
+                        val messageBody = smsMessage.messageBody
+                        processMessage(messageBody)
+                    }
+                } else {
+                    // For older devices, parse SMS messages manually
+                    val bundle = intent.extras
+                    if (bundle !=null) {
+                        val pdus = bundle["pdus"] as Array<*>?
+                        pdus?.forEach { pdu ->
+                            val smsMessage = SmsMessage.createFromPdu(pdu as ByteArray)
+                            val messageBody = smsMessage.messageBody
+                            processMessage(messageBody)
+                        }
+                    }
                 }
             }
         }
     }
-
     private val stopReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent?.action == STOP_SERVICE) {
@@ -60,18 +72,29 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
     override fun onCreate() {
         super.onCreate()
         tts = TextToSpeech(this, this)
-        registerReceiver(smsReceiver, IntentFilter(Telephony.Sms.Intents.SMS_RECEIVED_ACTION))
+
+        val smsIntentFilter = IntentFilter()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
+            smsIntentFilter.addAction(Telephony.Sms.Intents.SMS_RECEIVED_ACTION)
+        } else {
+            smsIntentFilter.addAction("android.provider.Telephony.SMS_RECEIVED")
+        }
+        registerReceiver(smsReceiver, smsIntentFilter)
+
         startMessageProcessing()
 
-        transactionBox = ObjectBox.store.boxFor()
-
         val filter = IntentFilter(STOP_SERVICE)
-        registerReceiver(stopReceiver, filter)
+
+        if (Build.VERSION.SDK_INT >= 33 ){
+            registerReceiver(stopReceiver, filter, RECEIVER_NOT_EXPORTED)
+        } else {
+            registerReceiver(stopReceiver, filter)
+        }
 
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         // Start the service in the foreground (for Android 8.0 and above)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel() // Create channel before starting foreground
             startForeground(notificationId, createNotification())
         } else {
@@ -110,7 +133,9 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
                 val date = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
                 val transaction = Transaction(amount = amount, type = type, date = date)
 
-                transactionBox.put(transaction)
+                scope.launch {
+                    transactionDao.insert(transaction) // Insert using Room
+                }
 
                 val announcementMessage = "${if (type == "Credit") "Received" else "Sent"} Rupees $amount"
                 Log.d("SMSService", "Queueing message: $announcementMessage")

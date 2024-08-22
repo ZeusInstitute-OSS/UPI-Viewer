@@ -1,144 +1,139 @@
 package com.zeusinstitute.upiapp
 
 import android.content.Context
+import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import io.objectbox.Box
-import io.objectbox.kotlin.boxFor
-import io.objectbox.kotlin.query
-import org.xmlpull.v1.XmlSerializer
-import java.io.File
-import java.io.FileOutputStream
-import android.util.Xml
-import io.objectbox.annotation.Entity
-import io.objectbox.annotation.Id
-
-@Entity
-data class Transaction(
-    @Id var id: Long = 0,
-    var amount: Double = 0.0,
-    var type: String = "",
-    var date: String = ""
-)
+import androidx.room.Room
+import kotlinx.coroutines.launch
+import java.io.StringWriter
+import javax.xml.parsers.DocumentBuilderFactory
+import javax.xml.transform.OutputKeys
+import javax.xml.transform.TransformerFactory
+import javax.xml.transform.dom.DOMSource
+import javax.xml.transform.stream.StreamResult
 
 class BillHistory : Fragment() {
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var exportButton: Button
-    private lateinit var clearButton: Button
-    private lateinit var warningText: TextView
-    private lateinit var transactionBox: Box<Transaction>
+    private lateinit var transactionRecyclerView: RecyclerView
+    private lateinit var adapter: TransactionAdapter
+    private lateinit var warningTextView: TextView
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    private lateinit var clearButton: Button
+    private lateinit var exportButton: Button
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
         val view = inflater.inflate(R.layout.fragment_bill_history, container, false)
 
-        recyclerView = view.findViewById(R.id.transactionRecyclerView)
-        exportButton = view.findViewById(R.id.exportButton)
-        clearButton = view.findViewById(R.id.clearButton)
-        warningText = view.findViewById(R.id.warningText)
+        transactionRecyclerView = view.findViewById(R.id.transactionRecyclerView)
+        warningTextView = view.findViewById(R.id.warningTextView)
 
-        transactionBox = ObjectBox.store.boxFor()
+        adapter = TransactionAdapter()
+        transactionRecyclerView.adapter = adapter
+        transactionRecyclerView.layoutManager = LinearLayoutManager(context)
 
-        setupRecyclerView()
-        setupButtons()
-        loadTransactions()
+        val db = Room.databaseBuilder(
+            requireContext(),
+            AppDatabase::class.java, "transactions"
+        ).build()
+
+        val transactionDao = db.transactionDao()
+
+        clearButton.setOnClickListener {
+            lifecycleScope.launch {
+                transactionDao.deleteAll() // Clear database
+                transactionRecyclerView.removeAllViews() // Clear UI
+            }
+        }
+
+        exportButton.setOnClickListener {
+            lifecycleScope.launch {
+                exportTransactionsToXML(transactionDao.getAllTransactions())
+            }
+        }
+
+        lifecycleScope.launch {
+            transactionDao.getAll().collect { transactions ->
+                transactionRecyclerView.removeAllViews()
+                transactions.forEach { transaction ->
+                    val transactionItemView = inflater.inflate(R.layout.transaction_item, transactionRecyclerView, false)
+                    val transactionIcon = transactionItemView.findViewById<ImageView>(R.id.transactionIcon)
+                    val transactionNameTextView = transactionItemView.findViewById<TextView>(R.id.transactionNameTextView)
+                    val transactionAmountTextView = transactionItemView.findViewById<TextView>(R.id.transactionAmountTextView)
+                    val transactionDateTextView = transactionItemView.findViewById<TextView>(R.id.transactionDateTextView)
+
+                    // Set icon based on transaction type (replace with your actual drawables)
+                    transactionIcon.setImageResource(if (transaction.type == "Debit") R.drawable.ic_debit else R.drawable.ic_credit)
+
+                    // Set transaction details (extract name from SMS data if possible)
+                    transactionNameTextView.text = extractNameFromTransaction(transaction) // Implement name extraction
+                    transactionAmountTextView.text = "₹${transaction.amount}" // Format amount with currency symbol
+                    transactionDateTextView.text = transaction.date
+
+                    transactionRecyclerView.addView(transactionItemView)
+                }
+            }
+        }
 
         return view
     }
 
-    private fun setupRecyclerView() {
-        recyclerView.layoutManager = LinearLayoutManager(context)
+    private fun extractNameFromTransaction(transaction: Transaction): String {
+        // TODO: Implement logic to extract the name from the transaction data (if available in SMS)
+        // For now, return a placeholder
+        return "Unknown"
     }
 
-    private fun setupButtons() {
-        exportButton.setOnClickListener { exportToXml() }
-        clearButton.setOnClickListener { clearTransactions() }
-    }
+    private fun exportTransactionsToXML(transactions: List<Transaction>) {
+        try {
+            val docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
+            val doc = docBuilder.newDocument()
+            val rootElement = doc.createElement("transactions")
+            doc.appendChild(rootElement)
 
-    private fun loadTransactions() {
-        val smsEnabled = requireActivity().getSharedPreferences("com.zeusinstitute.upiapp.preferences", Context.MODE_PRIVATE)
-            .getBoolean("sms_enabled", false)
+            transactions.forEach { transaction ->
+                val transactionElement = doc.createElement("transaction")
+                rootElement.appendChild(transactionElement)
 
-        if (smsEnabled) {
-            warningText.visibility = View.GONE
-            val transactions = transactionBox.query().orderDesc(Transaction_.date).build().find()
-            recyclerView.adapter = TransactionAdapter(transactions)
-        } else {
-            warningText.visibility = View.VISIBLE
-            warningText.text = "Bill History is disabled, enable SMS in login page"
-            warningText.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.holo_red_dark))
-        }
-    }
+                val typeElement = doc.createElement("type")
+                typeElement.appendChild(doc.createTextNode(transaction.type))
+                transactionElement.appendChild(typeElement)
 
-    private fun exportToXml() {
-        val transactions = transactionBox.all
-        context?.let { ctx ->
-            val xmlFile = File(ctx.getExternalFilesDir(null), "transactions.xml")
-            val serializer: XmlSerializer = Xml.newSerializer()
-            val writer = FileOutputStream(xmlFile).writer()
+                val amountElement = doc.createElement("amount")
+                amountElement.appendChild(doc.createTextNode(transaction.amount.toString()))
+                transactionElement.appendChild(amountElement)
 
-            serializer.setOutput(writer)
-            serializer.startDocument("UTF-8", true)
-            serializer.startTag("", "transactions")
-
-            for (transaction in transactions) {
-                serializer.startTag("", "transaction")
-                serializer.attribute("", "type", transaction.type)
-                serializer.startTag("", "amount")
-                serializer.text(transaction.amount.toString())
-                serializer.endTag("", "amount")
-                serializer.startTag("", "date")
-                serializer.text(transaction.date)
-                serializer.endTag("", "date")
-                serializer.endTag("", "transaction")
+                val dateElement = doc.createElement("date")
+                dateElement.appendChild(doc.createTextNode(transaction.date))
+                transactionElement.appendChild(dateElement)
             }
 
-            serializer.endTag("", "transactions")
-            serializer.endDocument()
-            writer.close()
+            val transformerFactory = TransformerFactory.newInstance()
+            val transformer = transformerFactory.newTransformer()
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes")
+            transformer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2")
+
+            val writer = StringWriter()
+            transformer.transform(DOMSource(doc), StreamResult(writer))
+            val xmlString = writer.toString()
+
+            // TODO: Save the xmlString to a file or share it as needed
+            println(xmlString) // Print XML to console for now
+        } catch (e: Exception) {
+            // Handle exceptions during XML creation
+            e.printStackTrace()
         }
     }
-
-    private fun clearTransactions() {
-        transactionBox.removeAll()
-        loadTransactions()
-    }
-}
-
-class TransactionAdapter(private val transactions: List<Transaction>) :
-    RecyclerView.Adapter<TransactionAdapter.ViewHolder>() {
-
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val amountTextView: TextView = view.findViewById(R.id.amountTextView)
-        val typeTextView: TextView = view.findViewById(R.id.typeTextView)
-        val dateTextView: TextView = view.findViewById(R.id.dateTextView)
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.transaction_item, parent, false)
-        return ViewHolder(view)
-    }
-
-    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val transaction = transactions[position]
-        holder.amountTextView.text = "Rs. ${transaction.amount}"
-        holder.typeTextView.text = transaction.type
-        holder.dateTextView.text = transaction.date
-
-        holder.amountTextView.setTextColor(
-            ContextCompat.getColor(holder.itemView.context,
-                if (transaction.type == "Credit") android.R.color.holo_green_dark else android.R.color.holo_red_dark
-            )
-        )
-    }
-
-    override fun getItemCount() = transactions.size
 }
