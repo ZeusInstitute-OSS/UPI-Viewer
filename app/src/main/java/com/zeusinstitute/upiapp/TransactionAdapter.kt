@@ -13,6 +13,7 @@ import com.zeusinstitute.upiapp.PayTransaction
 class TransactionAdapter : ListAdapter<PayTransaction, TransactionAdapter.TransactionViewHolder>(TransactionDiffCallback()) {
 
     class TransactionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val transactionStatusTextView: TextView = itemView.findViewById(R.id.transactionStatusTextView)
         val transactionIcon: ImageView = itemView.findViewById(R.id.transactionIcon)
         val transactionNameTextView: TextView = itemView.findViewById(R.id.transactionNameTextView)
         val transactionAmountTextView: TextView = itemView.findViewById(R.id.transactionAmountTextView)
@@ -33,6 +34,7 @@ class TransactionAdapter : ListAdapter<PayTransaction, TransactionAdapter.Transa
         holder.transactionNameTextView.text = "Unknown" // Replace with name extraction logic
         holder.transactionAmountTextView.text = "₹${transaction.amount}"
         holder.transactionDateTextView.text = transaction.date
+        holder.transactionStatusTextView.text = if (transaction.type == "Debit") "Sent" else "Received"
     }
 
     class TransactionDiffCallback : DiffUtil.ItemCallback<PayTransaction>() {

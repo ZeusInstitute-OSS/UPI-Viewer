@@ -3,34 +3,54 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
-    android:padding="8dp">
+    android:padding="8dp"
+    android:gravity="center_vertical">
 
     <ImageView
         android:id="@+id/transactionIcon"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
         android:contentDescription="Transaction Icon" />
 
-    <TextView
-        android:id="@+id/transactionNameTextView"
+    <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
         android:layout_weight="1"
-        android:text="Transaction Name" />
-
-    <TextView
-        android:id="@+id/transactionAmountTextView"
+        android:layout_marginStart="8dp"
+        android:orientation="vertical"><TextView
+        android:id="@+id/transactionNameTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:text="Amount" />
+        android:text="Transaction Name"
+        android:textSize="16sp" />
 
-    <TextView
-        android:id="@+id/transactionDateTextView"
+        <TextView
+            android:id="@+id/transactionDateTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Date"
+            android:textSize="12sp" />
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:text="Date" />
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/transactionAmountTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Amount"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/transactionStatusTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:text="Sent/Received"
+            android:textSize="14sp" />
+    </LinearLayout>
 
 </LinearLayout>
