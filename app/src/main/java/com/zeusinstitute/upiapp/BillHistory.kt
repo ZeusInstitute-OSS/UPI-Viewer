@@ -1,6 +1,9 @@
 package com.zeusinstitute.upiapp
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,6 +23,9 @@ import javax.xml.transform.TransformerFactory
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
 import com.zeusinstitute.upiapp.PayTransaction
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.withContext
 
 class BillHistory : Fragment() {
     private lateinit var transactionRecyclerView: RecyclerView
@@ -28,6 +34,7 @@ class BillHistory : Fragment() {
 
     private lateinit var clearButton: Button
     private lateinit var exportButton: Button
+    private lateinit var refreshButton: Button
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,15 +42,15 @@ class BillHistory : Fragment() {
     ): View? {
         val view = inflater.inflate(R.layout.fragment_bill_history, container, false)
 
-        clearButton = view.findViewById(R.id.clearButton) // Initialize clearButton
-        exportButton = view.findViewById(R.id.exportButton) // Initialize exportButton
-
         transactionRecyclerView = view.findViewById(R.id.transactionRecyclerView)
         warningTextView = view.findViewById(R.id.warningTextView)
+        clearButton = view.findViewById(R.id.clearButton)
+        exportButton = view.findViewById(R.id.exportButton)
+        refreshButton = view.findViewById(R.id.refreshButton)
 
         adapter = TransactionAdapter()
         transactionRecyclerView.adapter = adapter
-        transactionRecyclerView.layoutManager = LinearLayoutManager(context)
+        transactionRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
         val db = Room.databaseBuilder(
             requireContext(),
@@ -52,40 +59,41 @@ class BillHistory : Fragment() {
 
         val transactionDao = db.transactionDao()
 
+        refreshButton.setOnClickListener {
+            refreshData()
+         }
+
         clearButton.setOnClickListener {
             lifecycleScope.launch {
-                transactionDao.deleteAll() // Clear database
-                transactionRecyclerView.removeAllViews() // Clear UI
+                withContext(Dispatchers.IO) { // Perform database operation on IO dispatcher
+                    transactionDao.deleteAll()
+                }
+                adapter.submitList(emptyList()) // Update adapter after clearing, on the main thread
             }
         }
 
-        exportButton.setOnClickListener {
+        /*exportButton.setOnClickListener {
             lifecycleScope.launch {
                 exportTransactionsToXML(transactionDao.getAllTransactions())
+            }
+        }*/
+
+        exportButton.setOnClickListener {
+            lifecycleScope.launch {
+                val transactions = withContext(Dispatchers.IO) { // Fetch transactions on IO thread
+                    transactionDao.getAllTransactions()
+                }
+                exportTransactionsToXML(transactions) // Call export function on main thread}
+                Log.d("BillHistory", "Export button pressed for exporting into database") // Log insertion
             }
         }
 
         lifecycleScope.launch {
-            transactionDao.getAll().collect { transactions ->
-                transactionRecyclerView.removeAllViews()
-                transactions.forEach { transaction ->
-                    val transactionItemView = inflater.inflate(R.layout.transaction_item, transactionRecyclerView, false)
-                    val transactionIcon = transactionItemView.findViewById<ImageView>(R.id.transactionIcon)
-                    val transactionNameTextView = transactionItemView.findViewById<TextView>(R.id.transactionNameTextView)
-                    val transactionAmountTextView = transactionItemView.findViewById<TextView>(R.id.transactionAmountTextView)
-                    val transactionDateTextView = transactionItemView.findViewById<TextView>(R.id.transactionDateTextView)
-
-                    // Set icon based on transaction type (replace with your actual drawables)
-                    transactionIcon.setImageResource(if (transaction.type == "Debit") R.drawable.ic_debit else R.drawable.ic_credit)
-
-                    // Set transaction details (extract name from SMS data if possible)
-                    transactionNameTextView.text = extractNameFromTransaction(transaction) // Implement name extraction
-                    transactionAmountTextView.text = "₹${transaction.amount}" // Format amount with currency symbol
-                    transactionDateTextView.text = transaction.date
-
-                    transactionRecyclerView.addView(transactionItemView)
+            transactionDao.getAll()
+                .flowOn(Dispatchers.IO) // Switch Flow collection to IO thread
+                .collect { transactions ->
+                    adapter.submitList(transactions) // Update adapter on main thread
                 }
-            }
         }
 
         return view
@@ -137,4 +145,32 @@ class BillHistory : Fragment() {
             e.printStackTrace()
         }
     }
+    private fun refreshData() {
+        val sharedPref = requireActivity().getPreferences(Context.MODE_PRIVATE)
+        val smsEnabled = sharedPref.getBoolean("sms_enabled", false)
+
+        warningTextView.visibility = if (smsEnabled) View.GONE else View.VISIBLE
+        if (!smsEnabled) {
+            warningTextView.text = "History Disabled, enable from Login."
+            return // Don't reload data if SMS is disabled
+        }
+
+        lifecycleScope.launch {
+            val db = Room.databaseBuilder(
+                requireContext(),
+                AppDatabase::class.java, "transactions"
+            ).build()
+            val transactionDao = db.transactionDao()
+            val transactions = withContext(Dispatchers.IO) { transactionDao.getAllTransactions() }
+            adapter.submitList(transactions)
+            if (transactions.isEmpty()) {
+                warningTextView.text = "No Data Available"
+                warningTextView.visibility = View.VISIBLE
+            } else {
+                warningTextView.text = ""
+                warningTextView.visibility = View.GONE
+            }
+        }
+    }
 }
+

@@ -5,14 +5,6 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <TextView
-        android:id="@+id/warningTextView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Bill History is disabled. Enable SMS in login page."
-        android:textColor="@color/red"
-        android:visibility="gone" />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -31,18 +23,28 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Export" />
+        <Button
+            android:id="@+id/refreshButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Refresh" />
+
     </LinearLayout>
 
-    <ScrollView
+    <TextView
+        android:id="@+id/warningTextView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="History disabled, enable SMS from login"
+        android:textColor="@color/red"
+        android:visibility="gone" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/transactionRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1">
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/transactionRecyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" />
-    </ScrollView>
+        android:layout_weight="1" />
 
 </LinearLayout>

@@ -140,6 +140,7 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
 
                 scope.launch {
                     transactionDao.insert(transaction) // Insert using Room
+                    Log.d("SMSService", "Inserted transaction into database: $transaction") // Log insertion
                 }
 
                 val announcementMessage = "${if (type == "Credit") "Received" else "Sent"} Rupees $amount"
