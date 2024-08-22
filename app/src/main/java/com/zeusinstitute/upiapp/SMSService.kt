@@ -51,7 +51,7 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
                 } else {
                     // For older devices, parse SMS messages manually
                     val bundle = intent.extras
-                    if (bundle !=null) {
+                    if (bundle != null) {
                         val pdus = bundle["pdus"] as Array<*>?
                         pdus?.forEach { pdu ->
                             val smsMessage = SmsMessage.createFromPdu(pdu as ByteArray)
@@ -63,6 +63,7 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
             }
         }
     }
+
     private val stopReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent?.action == STOP_SERVICE) {
@@ -123,6 +124,24 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
         val regex = "Rs\\.?\\s*(\\d+(\\.\\d{2})?)".toRegex()
         val matchResult = regex.find(message)
 
+        var extractedName: String? = null
+
+        if (message.contains('@')) {
+            val atIndex = message.indexOf('@')
+            val spaceBeforeAt = message.lastIndexOf(' ', atIndex)
+            extractedName = message.substring(spaceBeforeAt + 1, message.indexOf(' ', atIndex + 1))
+        } else {
+            val fromIndex = message.indexOf("from")
+            if (fromIndex != -1) {
+                extractedName = message.substring(fromIndex + 5).trim().split(" ")[0]
+            } else {
+                val FromIndex = message.indexOf("From")
+                if (FromIndex != -1) {
+                    extractedName = message.substring(FromIndex + 5).trim().split(" ")[0]
+                }
+            }
+        }
+
         matchResult?.let { result ->
             val amount = result.groupValues[1].toDoubleOrNull()
             if (amount != null) {
@@ -136,7 +155,7 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
                 }
 
                 val date = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
-                val transaction = PayTransaction(amount = amount, type = type, date = date)
+                val transaction = PayTransaction(amount = amount, type = type, date = date, name = extractedName.toString())
 
                 scope.launch {
                     transactionDao.insert(transaction) // Insert using Room
@@ -187,10 +206,8 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
             .setAutoCancel(true)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // For Android 8.0 and above, use the notification channel
             notificationManager.notify(notificationId, notificationBuilder.build())
         } else {
-            // For older versions, show the notification directly
             @Suppress("DEPRECATION")
             notificationManager.notify(notificationId, notificationBuilder.build())
         }
@@ -208,6 +225,8 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
 
         return notificationBuilder.build()
     }
+
+
 
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) { // Check SDK version

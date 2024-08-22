@@ -97,13 +97,6 @@ class BillHistory : Fragment() {
         }
         return view
     }
-
-    private fun extractNameFromTransaction(transaction: PayTransaction): String {
-        // TODO: Implement logic to extract the name from the transaction data (if available in SMS)
-        // For now, return a placeholder
-        return "Unknown"
-    }
-
     private fun exportTransactionsToXML(transactions: List<PayTransaction>) {
         try {
             val docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
@@ -114,6 +107,10 @@ class BillHistory : Fragment() {
             transactions.forEach { transaction ->
                 val transactionElement = doc.createElement("transaction")
                 rootElement.appendChild(transactionElement)
+
+                val nameElement = doc.createElement("name")
+                nameElement.appendChild(doc.createTextNode(transaction.name))
+                transactionElement.appendChild(nameElement)
 
                 val typeElement = doc.createElement("type")
                 typeElement.appendChild(doc.createTextNode(transaction.type))

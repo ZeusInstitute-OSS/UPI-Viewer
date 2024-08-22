@@ -31,7 +31,7 @@ class TransactionAdapter : ListAdapter<PayTransaction, TransactionAdapter.Transa
             if (transaction.type == "Debit") R.drawable.ic_debit
             else R.drawable.ic_credit
         )
-        holder.transactionNameTextView.text = "Unknown" // Replace with name extraction logic
+        holder.transactionNameTextView.text = "${transaction.name}"
         holder.transactionAmountTextView.text = "₹${transaction.amount}"
         holder.transactionDateTextView.text = transaction.date
         holder.transactionStatusTextView.text = if (transaction.type == "Debit") "Sent" else "Received"
