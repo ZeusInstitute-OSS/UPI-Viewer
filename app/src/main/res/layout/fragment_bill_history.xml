@@ -38,7 +38,7 @@
         android:layout_height="0dp"
         android:layout_weight="1">
 
-        <RecyclerView
+        <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/transactionRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
