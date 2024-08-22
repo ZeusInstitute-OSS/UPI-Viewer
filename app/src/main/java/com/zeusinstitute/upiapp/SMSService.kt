@@ -21,6 +21,8 @@ import kotlinx.coroutines.*
 import androidx.room.*
 import java.text.SimpleDateFormat
 
+
+
 class SMSService : Service(), TextToSpeech.OnInitListener {
     private var tts: TextToSpeech? = null
     private val messageQueue = LinkedBlockingQueue<String>()
@@ -29,7 +31,7 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
     private val notificationId = 1
     private val notificationChannelId = "sms_service_channel"
     private lateinit var notificationManager: NotificationManager
-    private lateinit var db: AppDatabase
+    private lateinit var transactionBox: Box<Transaction>
 
     companion object {
         const val STOP_SERVICE = "STOP_SERVICE"
@@ -38,20 +40,7 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
     private val smsReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent?.action == Telephony.Sms.Intents.SMS_RECEIVED_ACTION) {
-                val messages = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                    Telephony.Sms.Intents.getMessagesFromIntent(intent)
-                } else {
-                    val bundle = intent.extras
-                    if (bundle != null) {
-                        val pdus = bundle["pdus"] as Array<*>?
-                        pdus?.map { pdu ->
-                            SmsMessage.createFromPdu(pdu as ByteArray)
-                        }?.toTypedArray()
-                    } else {
-                        null
-                    }
-                }
-
+                val messages = Telephony.Sms.Intents.getMessagesFromIntent(intent)
                 messages?.forEach { smsMessage ->
                     val messageBody = smsMessage.messageBody
                     processMessage(messageBody)
@@ -74,7 +63,7 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
         registerReceiver(smsReceiver, IntentFilter(Telephony.Sms.Intents.SMS_RECEIVED_ACTION))
         startMessageProcessing()
 
-        db = AppDatabase.getInstance(applicationContext)
+        transactionBox = ObjectBox.store.boxFor()
 
         val filter = IntentFilter(STOP_SERVICE)
         registerReceiver(stopReceiver, filter)
@@ -121,9 +110,7 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
                 val date = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
                 val transaction = Transaction(amount = amount, type = type, date = date)
 
-                scope.launch {
-                    db.transactionDao().insert(transaction)
-                }
+                transactionBox.put(transaction)
 
                 val announcementMessage = "${if (type == "Credit") "Received" else "Sent"} Rupees $amount"
                 Log.d("SMSService", "Queueing message: $announcementMessage")

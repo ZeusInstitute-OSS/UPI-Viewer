@@ -7,64 +7,34 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.room.*
-import kotlinx.coroutines.launch
+import io.objectbox.Box
+import io.objectbox.kotlin.boxFor
+import io.objectbox.kotlin.query
 import org.xmlpull.v1.XmlSerializer
 import java.io.File
 import java.io.FileOutputStream
 import android.util.Xml
-import android.widget.ImageView
-import androidx.core.content.ContextCompat
+import io.objectbox.annotation.Entity
+import io.objectbox.annotation.Id
 
 @Entity
 data class Transaction(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
-    val amount: Double,
-    val type: String,
-    val date: String
+    @Id var id: Long = 0,
+    var amount: Double = 0.0,
+    var type: String = "",
+    var date: String = ""
 )
-
-@Dao
-interface TransactionDao {
-    @Query("SELECT * FROM transaction ORDER BY date DESC")
-    fun getAll(): List<Transaction>
-
-    @Insert
-    suspend fun insert(transaction: Transaction)
-
-    @Query("DELETE FROM transaction")
-    suspend fun deleteAll()
-}
-
-@Database(entities = [Transaction::class], version = 1)
-abstract class AppDatabase : RoomDatabase() {
-    abstract fun transactionDao(): TransactionDao
-
-    companion object {
-        private var instance: AppDatabase? = null
-
-        fun getInstance(context: Context): AppDatabase {
-            return instance ?: synchronized(this) {
-                instance ?: Room.databaseBuilder(
-                    context.applicationContext,
-                    AppDatabase::class.java,
-                    "transaction_database"
-                ).build().also { instance = it }
-            }
-        }
-    }
-}
 
 class BillHistory : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var exportButton: Button
     private lateinit var clearButton: Button
-    private lateinit var db: AppDatabase
     private lateinit var warningText: TextView
+    private lateinit var transactionBox: Box<Transaction>
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_bill_history, container, false)
@@ -74,7 +44,7 @@ class BillHistory : Fragment() {
         clearButton = view.findViewById(R.id.clearButton)
         warningText = view.findViewById(R.id.warningText)
 
-        db = AppDatabase.getInstance(requireContext())
+        transactionBox = ObjectBox.store.boxFor()
 
         setupRecyclerView()
         setupButtons()
@@ -98,48 +68,47 @@ class BillHistory : Fragment() {
 
         if (smsEnabled) {
             warningText.visibility = View.GONE
-            lifecycleScope.launch {
-                val transactions = db.transactionDao().getAll()
-                recyclerView.adapter = TransactionAdapter(transactions)
-            }
+            val transactions = transactionBox.query().orderDesc(Transaction_.date).build().find()
+            recyclerView.adapter = TransactionAdapter(transactions)
         } else {
             warningText.visibility = View.VISIBLE
             warningText.text = "Bill History is disabled, enable SMS in login page"
-            warningText.setTextColor(resources.getColor(android.R.color.holo_red_dark))
+            warningText.setTextColor(ContextCompat.getColor(requireContext(), android.R.color.holo_red_dark))
         }
     }
 
     private fun exportToXml() {
-        lifecycleScope.launch {
-            val transactions = db.transactionDao().getAll()
-            val xmlFile = File(requireContext().getExternalFilesDir(null), "transactions.xml")
+        val transactions = transactionBox.all
+        context?.let { ctx ->
+            val xmlFile = File(ctx.getExternalFilesDir(null), "transactions.xml")
             val serializer: XmlSerializer = Xml.newSerializer()
-            FileOutputStream(xmlFile).writer().use { writer ->
-                serializer.setOutput(writer)
-                serializer.startDocument("UTF-8", true)
-                serializer.startTag("", "transactions")
-                for (transaction in transactions) {
-                    serializer.startTag("", "transaction")
-                    serializer.attribute("", "type", transaction.type)
-                    serializer.startTag("", "amount")
-                    serializer.text(transaction.amount.toString())
-                    serializer.endTag("", "amount")
-                    serializer.startTag("", "date")
-                    serializer.text(transaction.date)
-                    serializer.endTag("", "date")
-                    serializer.endTag("", "transaction")
-                }
-                serializer.endTag("", "transactions")
-                serializer.endDocument()
+            val writer = FileOutputStream(xmlFile).writer()
+
+            serializer.setOutput(writer)
+            serializer.startDocument("UTF-8", true)
+            serializer.startTag("", "transactions")
+
+            for (transaction in transactions) {
+                serializer.startTag("", "transaction")
+                serializer.attribute("", "type", transaction.type)
+                serializer.startTag("", "amount")
+                serializer.text(transaction.amount.toString())
+                serializer.endTag("", "amount")
+                serializer.startTag("", "date")
+                serializer.text(transaction.date)
+                serializer.endTag("", "date")
+                serializer.endTag("", "transaction")
             }
+
+            serializer.endTag("", "transactions")
+            serializer.endDocument()
+            writer.close()
         }
     }
 
     private fun clearTransactions() {
-        lifecycleScope.launch {
-            db.transactionDao().deleteAll()
-            loadTransactions()
-        }
+        transactionBox.removeAll()
+        loadTransactions()
     }
 }
 
@@ -149,7 +118,6 @@ class TransactionAdapter(private val transactions: List<Transaction>) :
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val amountTextView: TextView = view.findViewById(R.id.amountTextView)
         val typeTextView: TextView = view.findViewById(R.id.typeTextView)
-        val iconImageView: ImageView = view.findViewById(R.id.iconImageView)
         val dateTextView: TextView = view.findViewById(R.id.dateTextView)
     }
 
@@ -164,10 +132,6 @@ class TransactionAdapter(private val transactions: List<Transaction>) :
         holder.amountTextView.text = "Rs. ${transaction.amount}"
         holder.typeTextView.text = transaction.type
         holder.dateTextView.text = transaction.date
-
-        holder.iconImageView.setImageResource(
-            if (transaction.type == "Credit") R.drawable.ic_credit else R.drawable.ic_debit
-        )
 
         holder.amountTextView.setTextColor(
             ContextCompat.getColor(holder.itemView.context,
