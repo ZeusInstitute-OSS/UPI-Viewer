@@ -77,6 +77,10 @@ class MainActivity : AppCompatActivity() {
                 findNavController(R.id.nav_host_fragment_content_main).navigate(R.id.action_firstFragment_to_splitBillFragment)
                 true
             }
+            R.id.billHistory -> {
+                findNavController(R.id.nav_host_fragment_content_main).navigate(R.id.action_firstFragment_to_billHistory)
+                true
+            }
             R.id.DynUPI -> {
                 findNavController(R.id.nav_host_fragment_content_main).navigate(R.id.action_firstFragment_to_dynamicFragment)
                 true
