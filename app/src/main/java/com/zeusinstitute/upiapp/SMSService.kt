@@ -30,6 +30,8 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
     private val notificationId = 1
     private val notificationChannelId = "sms_service_channel"
     private lateinit var notificationManager: NotificationManager
+
+    private lateinit var db: AppDatabase
     lateinit var transactionDao: TransactionDao
 
     companion object {
@@ -72,6 +74,9 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
     override fun onCreate() {
         super.onCreate()
         tts = TextToSpeech(this, this)
+
+        db = AppDatabase.getDatabase(applicationContext)
+        transactionDao = db.transactionDao() // Initialize transactionDao
 
         val smsIntentFilter = IntentFilter()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
@@ -131,7 +136,7 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
                 }
 
                 val date = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
-                val transaction = Transaction(amount = amount, type = type, date = date)
+                val transaction = PayTransaction(amount = amount, type = type, date = date)
 
                 scope.launch {
                     transactionDao.insert(transaction) // Insert using Room

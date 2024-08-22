@@ -8,8 +8,9 @@ import android.widget.TextView
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.zeusinstitute.upiapp.PayTransaction
 
-class TransactionAdapter : ListAdapter<Transaction, TransactionAdapter.TransactionViewHolder>(TransactionDiffCallback()) {
+class TransactionAdapter : ListAdapter<PayTransaction, TransactionAdapter.TransactionViewHolder>(TransactionDiffCallback()) {
 
     class TransactionViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val transactionIcon: ImageView = itemView.findViewById(R.id.transactionIcon)
@@ -34,12 +35,12 @@ class TransactionAdapter : ListAdapter<Transaction, TransactionAdapter.Transacti
         holder.transactionDateTextView.text = transaction.date
     }
 
-    class TransactionDiffCallback : DiffUtil.ItemCallback<Transaction>() {
-        override fun areItemsTheSame(oldItem: Transaction, newItem: Transaction): Boolean {
+    class TransactionDiffCallback : DiffUtil.ItemCallback<PayTransaction>() {
+        override fun areItemsTheSame(oldItem: PayTransaction, newItem: PayTransaction): Boolean {
             return oldItem.id == newItem.id
         }
 
-        override fun areContentsTheSame(oldItem: Transaction, newItem: Transaction): Boolean {
+        override fun areContentsTheSame(oldItem: PayTransaction, newItem: PayTransaction): Boolean {
             return oldItem == newItem
         }
     }

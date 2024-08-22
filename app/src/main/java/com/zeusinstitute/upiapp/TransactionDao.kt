@@ -1,19 +1,21 @@
 package com.zeusinstitute.upiapp
 
-import androidx.room.*
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface TransactionDao {
     @Insert
-    suspend fun insert(transaction: com.zeusinstitute.upiapp.Transaction)
+    fun insert(transaction: PayTransaction)
 
-    @Query("SELECT * FROM Transaction ORDER BY date DESC")
-    fun getAll(): Flow<List<Transaction>>
+    @Query("SELECT * FROM PayTransaction ORDER BY date DESC")
+    fun getAll(): Flow<List<PayTransaction>>
 
-    @Query("DELETE FROM Transaction")
-    suspend fun deleteAll()
+    @Query("DELETE FROM PayTransaction")
+    fun deleteAll()
 
-    @Query("SELECT * FROM Transaction")
-    suspend fun getAllTransactions(): List<Transaction>
+    @Query("SELECT * FROM PayTransaction")
+    fun getAllTransactions(): List<PayTransaction>
 }

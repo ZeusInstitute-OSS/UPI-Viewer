@@ -1,14 +1,11 @@
 package com.zeusinstitute.upiapp
 
-import android.content.Context
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -22,6 +19,7 @@ import javax.xml.transform.OutputKeys
 import javax.xml.transform.TransformerFactory
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
+import com.zeusinstitute.upiapp.PayTransaction
 
 class BillHistory : Fragment() {
     private lateinit var transactionRecyclerView: RecyclerView
@@ -36,6 +34,9 @@ class BillHistory : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_bill_history, container, false)
+
+        clearButton = view.findViewById(R.id.clearButton) // Initialize clearButton
+        exportButton = view.findViewById(R.id.exportButton) // Initialize exportButton
 
         transactionRecyclerView = view.findViewById(R.id.transactionRecyclerView)
         warningTextView = view.findViewById(R.id.warningTextView)
@@ -90,13 +91,13 @@ class BillHistory : Fragment() {
         return view
     }
 
-    private fun extractNameFromTransaction(transaction: Transaction): String {
+    private fun extractNameFromTransaction(transaction: PayTransaction): String {
         // TODO: Implement logic to extract the name from the transaction data (if available in SMS)
         // For now, return a placeholder
         return "Unknown"
     }
 
-    private fun exportTransactionsToXML(transactions: List<Transaction>) {
+    private fun exportTransactionsToXML(transactions: List<PayTransaction>) {
         try {
             val docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
             val doc = docBuilder.newDocument()

@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity
-data class Transaction(
+data class PayTransaction(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val amount: Double,
     val type: String, // "Credit" or "Debit"
