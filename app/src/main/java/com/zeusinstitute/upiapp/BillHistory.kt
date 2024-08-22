@@ -52,10 +52,8 @@ class BillHistory : Fragment() {
         transactionRecyclerView.adapter = adapter
         transactionRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        val db = Room.databaseBuilder(
-            requireContext(),
-            AppDatabase::class.java, "transactions"
-        ).build()
+        val db = (requireContext().applicationContext as UPIAPP).database
+
 
         val transactionDao = db.transactionDao()
 
@@ -89,6 +87,7 @@ class BillHistory : Fragment() {
         }
 
         lifecycleScope.launch {
+            Log.d("BillHistory", "Attempting to read transactions from database")
             transactionDao.getAll()
                 .flowOn(Dispatchers.IO) // Switch Flow collection to IO thread
                 .collect { transactions ->
@@ -163,6 +162,7 @@ class BillHistory : Fragment() {
             val transactionDao = db.transactionDao()
             val transactions = withContext(Dispatchers.IO) { transactionDao.getAllTransactions() }
             adapter.submitList(transactions)
+            Log.d("BillHistory", "Fetched ${transactions.size} transactions")
             if (transactions.isEmpty()) {
                 warningTextView.text = "No Data Available"
                 warningTextView.visibility = View.VISIBLE
