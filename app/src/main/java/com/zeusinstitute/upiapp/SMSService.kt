@@ -18,6 +18,9 @@ import androidx.core.app.NotificationCompat
 import java.util.*
 import java.util.concurrent.LinkedBlockingQueue
 import kotlinx.coroutines.*
+import androidx.room.*
+import java.text.SimpleDateFormat
+
 
 class SMSService : Service(), TextToSpeech.OnInitListener {
     private var tts: TextToSpeech? = null
@@ -28,6 +31,9 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
     private val notificationChannelId = "sms_service_channel"
     private lateinit var notificationManager: NotificationManager
 
+    private lateinit var db: AppDatabase
+    lateinit var transactionDao: TransactionDao
+
     companion object {
         const val STOP_SERVICE = "STOP_SERVICE"
     }
@@ -35,23 +41,24 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
     private val smsReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
             if (intent?.action == Telephony.Sms.Intents.SMS_RECEIVED_ACTION) {
-                val messages = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                    Telephony.Sms.Intents.getMessagesFromIntent(intent)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    // For KitKat and above, use the bundled SMS API
+                    val smsMessages = Telephony.Sms.Intents.getMessagesFromIntent(intent)
+                    smsMessages?.forEach { smsMessage ->
+                        val messageBody = smsMessage.messageBody
+                        processMessage(messageBody)
+                    }
                 } else {
+                    // For older devices, parse SMS messages manually
                     val bundle = intent.extras
                     if (bundle != null) {
                         val pdus = bundle["pdus"] as Array<*>?
-                        pdus?.map { pdu ->
-                            SmsMessage.createFromPdu(pdu as ByteArray)
-                        }?.toTypedArray()
-                    } else {
-                        null
+                        pdus?.forEach { pdu ->
+                            val smsMessage = SmsMessage.createFromPdu(pdu as ByteArray)
+                            val messageBody = smsMessage.messageBody
+                            processMessage(messageBody)
+                        }
                     }
-                }
-
-                messages?.forEach { smsMessage ->
-                    val messageBody = smsMessage.messageBody
-                    processMessage(messageBody)
                 }
             }
         }
@@ -68,15 +75,32 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
     override fun onCreate() {
         super.onCreate()
         tts = TextToSpeech(this, this)
-        registerReceiver(smsReceiver, IntentFilter(Telephony.Sms.Intents.SMS_RECEIVED_ACTION))
+
+        this.db = (applicationContext as UPIAPP).database
+        transactionDao = db.transactionDao() // Initialize transactionDao
+
+        val smsIntentFilter = IntentFilter()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
+            smsIntentFilter.addAction(Telephony.Sms.Intents.SMS_RECEIVED_ACTION)
+        } else {
+            smsIntentFilter.addAction("android.provider.Telephony.SMS_RECEIVED")
+        }
+        registerReceiver(smsReceiver, smsIntentFilter)
+
         startMessageProcessing()
+
         val filter = IntentFilter(STOP_SERVICE)
-        registerReceiver(stopReceiver, filter)
+
+        if (Build.VERSION.SDK_INT >= 33 ){
+            registerReceiver(stopReceiver, filter, RECEIVER_NOT_EXPORTED)
+        } else {
+            registerReceiver(stopReceiver, filter)
+        }
 
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         // Start the service in the foreground (for Android 8.0 and above)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             createNotificationChannel() // Create channel before starting foreground
             startForeground(notificationId, createNotification())
         } else {
@@ -97,36 +121,41 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
             return
         }
 
-        if (message.contains("credited") && !message.contains("debited") && !message.contains("credited to")) {
-            val regex = "Rs\\.?\\s*(\\d+(\\.\\d{2})?)".toRegex() // Match Rs or Rs.
-            val matchResult = regex.find(message)
-            matchResult?.let {
-                val amount = it.groupValues[1]
-                val announcementMessage = "Received Rupees $amount"
+        val regex = "Rs\\.?\\s*(\\d+(\\.\\d{2})?)".toRegex()
+        val matchResult = regex.find(message)
+
+        var extractedName: String? = null
+        val nameRegex = "(?i)(?:from|From|FROM)\\s+(.*?)(?:\\.|thru|through)".toRegex()
+        val nameMatchResult = nameRegex.find(message)
+        extractedName = nameMatchResult?.groupValues?.getOrNull(1)?.trim()
+
+        matchResult?.let { result ->
+            val amount = result.groupValues[1].toDoubleOrNull()
+            if (amount != null) {
+                val type = when {
+                    message.contains("credited") && !message.contains("debited") -> "Credit"
+                    message.contains("debited") -> "Debit"
+                    else -> {
+                        Log.d("SMSService", "Message does not match criteria for announcement")
+                        return
+                    }
+                }
+
+                val date = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
+                val transaction = PayTransaction(amount = amount, type = type, date = date, name = extractedName ?: "") // Use empty string if name is null
+
+                scope.launch {
+                    transactionDao.insert(transaction)
+                    Log.d("SMSService", "Inserted transaction into database: $transaction")
+                }
+
+                val announcementMessage = "${if (type == "Credit") "Received" else "Sent"} Rupees $amount"
                 Log.d("SMSService", "Queueing message: $announcementMessage")
                 messageQueue.offer(announcementMessage)
-            } ?: Log.d("SMSService", "No amount found in the message")
-        } else if (message.contains("debited")) {
-            val regex = "Rs\\.?\\s*(\\d+(\\.\\d{2})?)".toRegex() // Match Rs or Rs.
-            val matchResult = regex.find(message)
-            matchResult?.let {
-                val amount = it.groupValues[1]
-                val announcementMessage = "Sent Rupees $amount"
-                Log.d("SMSService", "Queueing message: $announcementMessage")
-                messageQueue.offer(announcementMessage)
-            } ?: Log.d("SMSService", "No amount found in the message")
-        } else if (message.contains("credited") && message.contains("credited to")) {
-            val regex = "Rs\\.?\\s*(\\d+(\\.\\d{2})?)".toRegex() // Match Rs or Rs.
-            val matchResult = regex.find(message)
-            matchResult?.let {
-                val amount = it.groupValues[1]
-                val announcementMessage = "Received Rupees $amount"
-                Log.d("SMSService", "Queueing message: $announcementMessage")
-                messageQueue.offer(announcementMessage)
-            } ?: Log.d("SMSService", "No amount found in the message")
-        } else {
-            Log.d("SMSService", "Message does not match criteria for announcement")
-        }
+            } else {
+                Log.d("SMSService", "Invalid amount format in the message")
+            }
+        } ?: Log.d("SMSService", "No amount found in the message")
     }
 
     private fun startMessageProcessing() {
@@ -164,10 +193,8 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
             .setAutoCancel(true)
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // For Android 8.0 and above, use the notification channel
             notificationManager.notify(notificationId, notificationBuilder.build())
         } else {
-            // For older versions, show the notification directly
             @Suppress("DEPRECATION")
             notificationManager.notify(notificationId, notificationBuilder.build())
         }
@@ -185,6 +212,8 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
 
         return notificationBuilder.build()
     }
+
+
 
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) { // Check SDK version

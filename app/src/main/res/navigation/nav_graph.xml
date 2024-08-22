@@ -24,6 +24,9 @@
               <action
                   android:id="@+id/action_firstFragment_to_Update"
                   app:destination="@id/Update" />
+              <action
+                  android:id="@+id/action_firstFragment_to_billHistory"
+                  app:destination="@id/billHistory" />
        </fragment>
        <fragment
            android:id="@+id/login"
@@ -47,6 +50,10 @@
            android:id="@+id/splitBillFragment"
            android:name="SplitBillFragment"
            android:label="Split the Bill" />
+       <fragment
+           android:id="@+id/billHistory"
+           android:name="com.zeusinstitute.upiapp.BillHistory"
+           android:label="Payment History" />
        <fragment
            android:id="@+id/Update"
            android:name="com.zeusinstitute.upiapp.UpdateFragment"
