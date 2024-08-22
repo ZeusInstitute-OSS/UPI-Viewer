@@ -75,7 +75,7 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
         super.onCreate()
         tts = TextToSpeech(this, this)
 
-        db = AppDatabase.getDatabase(applicationContext)
+        this.db = (applicationContext as UPIAPP).database
         transactionDao = db.transactionDao() // Initialize transactionDao
 
         val smsIntentFilter = IntentFilter()

@@ -92,9 +92,9 @@ class BillHistory : Fragment() {
                 .flowOn(Dispatchers.IO) // Switch Flow collection to IO thread
                 .collect { transactions ->
                     adapter.submitList(transactions) // Update adapter on main thread
+                    Log.d("BillHistory", "Fetched ${transactions.size} transactions")
                 }
         }
-
         return view
     }
 
@@ -155,10 +155,7 @@ class BillHistory : Fragment() {
         }
 
         lifecycleScope.launch {
-            val db = Room.databaseBuilder(
-                requireContext(),
-                AppDatabase::class.java, "transactions"
-            ).build()
+            val db = (requireContext().applicationContext as UPIAPP).database // Get centralized database
             val transactionDao = db.transactionDao()
             val transactions = withContext(Dispatchers.IO) { transactionDao.getAllTransactions() }
             adapter.submitList(transactions)
