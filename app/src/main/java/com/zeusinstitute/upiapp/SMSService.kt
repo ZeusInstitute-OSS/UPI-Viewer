@@ -18,6 +18,9 @@ import androidx.core.app.NotificationCompat
 import java.util.*
 import java.util.concurrent.LinkedBlockingQueue
 import kotlinx.coroutines.*
+import androidx.room.Room
+import java.text.import androidx.room.Room
+import java.text.SimpleDateFormat
 
 class SMSService : Service(), TextToSpeech.OnInitListener {
     private var tts: TextToSpeech? = null
@@ -27,6 +30,7 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
     private val notificationId = 1
     private val notificationChannelId = "sms_service_channel"
     private lateinit var notificationManager: NotificationManager
+    private lateinit var db: AppDatabase
 
     companion object {
         const val STOP_SERVICE = "STOP_SERVICE"
@@ -70,6 +74,9 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
         tts = TextToSpeech(this, this)
         registerReceiver(smsReceiver, IntentFilter(Telephony.Sms.Intents.SMS_RECEIVED_ACTION))
         startMessageProcessing()
+
+        db = AppDatabase.getInstance(this)
+
         val filter = IntentFilter(STOP_SERVICE)
         registerReceiver(stopReceiver, filter)
 
@@ -97,36 +104,35 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
             return
         }
 
-        if (message.contains("credited") && !message.contains("debited") && !message.contains("credited to")) {
-            val regex = "Rs\\.?\\s*(\\d+(\\.\\d{2})?)".toRegex() // Match Rs or Rs.
-            val matchResult = regex.find(message)
-            matchResult?.let {
-                val amount = it.groupValues[1]
-                val announcementMessage = "Received Rupees $amount"
+        val regex = "Rs\\.?\\s*(\\d+(\\.\\d{2})?)".toRegex()
+        val matchResult = regex.find(message)
+
+        matchResult?.let { result ->
+            val amount = result.groupValues[1].toDoubleOrNull()
+            if (amount != null) {
+                val type = when {
+                    message.contains("credited") && !message.contains("debited") -> "Credit"
+                    message.contains("debited") -> "Debit"
+                    else -> {
+                        Log.d("SMSService", "Message does not match criteria for announcement")
+                        return
+                    }
+                }
+
+                val date = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
+                val transaction = Transaction(amount = amount, type = type, date = date)
+
+                scope.launch {
+                    db.transactionDao().insert(transaction)
+                }
+
+                val announcementMessage = "${if (type == "Credit") "Received" else "Sent"} Rupees $amount"
                 Log.d("SMSService", "Queueing message: $announcementMessage")
                 messageQueue.offer(announcementMessage)
-            } ?: Log.d("SMSService", "No amount found in the message")
-        } else if (message.contains("debited")) {
-            val regex = "Rs\\.?\\s*(\\d+(\\.\\d{2})?)".toRegex() // Match Rs or Rs.
-            val matchResult = regex.find(message)
-            matchResult?.let {
-                val amount = it.groupValues[1]
-                val announcementMessage = "Sent Rupees $amount"
-                Log.d("SMSService", "Queueing message: $announcementMessage")
-                messageQueue.offer(announcementMessage)
-            } ?: Log.d("SMSService", "No amount found in the message")
-        } else if (message.contains("credited") && message.contains("credited to")) {
-            val regex = "Rs\\.?\\s*(\\d+(\\.\\d{2})?)".toRegex() // Match Rs or Rs.
-            val matchResult = regex.find(message)
-            matchResult?.let {
-                val amount = it.groupValues[1]
-                val announcementMessage = "Received Rupees $amount"
-                Log.d("SMSService", "Queueing message: $announcementMessage")
-                messageQueue.offer(announcementMessage)
-            } ?: Log.d("SMSService", "No amount found in the message")
-        } else {
-            Log.d("SMSService", "Message does not match criteria for announcement")
-        }
+            } else {
+                Log.d("SMSService", "Invalid amount format in the message")
+            }
+        } ?: Log.d("SMSService", "No amount found in the message")
     }
 
     private fun startMessageProcessing() {

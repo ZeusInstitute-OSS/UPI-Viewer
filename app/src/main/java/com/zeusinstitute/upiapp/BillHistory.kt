@@ -1,56 +1,83 @@
 package com.zeusinstitute.upiapp
 
 import android.content.Context
-import android.content.SharedPreferences
-import android.graphics.Color
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import android.widget.ImageView
 import android.widget.TextView
-import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.room.*
+import kotlinx.coroutines.launch
 import org.xmlpull.v1.XmlSerializer
 import java.io.File
 import java.io.FileOutputStream
 import android.util.Xml
+import android.widget.ImageView
+import androidx.core.content.ContextCompat
 
+@Entity
 data class Transaction(
+    @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val amount: Double,
-    val from: String,
-    val isCredit: Boolean,
+    val type: String,
     val date: String
 )
 
-class BillHistory : Fragment() {
+@Dao
+interface TransactionDao {
+    @Query("SELECT * FROM transaction ORDER BY date DESC")
+    fun getAll(): List<Transaction>
 
+    @Insert
+    suspend fun insert(transaction: Transaction)
+
+    @Query("DELETE FROM transaction")
+    suspend fun deleteAll()
+}
+
+@Database(entities = [Transaction::class], version = 1)
+abstract class AppDatabase : RoomDatabase() {
+    abstract fun transactionDao(): TransactionDao
+
+    companion object {
+        private var instance: AppDatabase? = null
+
+        fun getInstance(context: Context): AppDatabase {
+            return instance ?: synchronized(this) {
+                instance ?: Room.databaseBuilder(
+                    context.applicationContext,
+                    AppDatabase::class.java,
+                    "transaction_database"
+                ).build().also { instance = it }
+            }
+        }
+    }
+}
+
+class BillHistory : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var exportButton: Button
-    private lateinit var clearButton: Button // New clear button
-    private val transactions = mutableListOf<Transaction>()
-    private lateinit var sharedPref: SharedPreferences // For accessing SharedPreferences
+    private lateinit var clearButton: Button
+    private lateinit var db: AppDatabase
+    private lateinit var warningText: TextView
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_bill_history, container, false)
 
         recyclerView = view.findViewById(R.id.transactionRecyclerView)
         exportButton = view.findViewById(R.id.exportButton)
-        clearButton = view.findViewById(R.id.clearButton) // Initialize clear button
+        clearButton = view.findViewById(R.id.clearButton)
+        warningText = view.findViewById(R.id.warningText)
 
-        sharedPref = requireActivity().getSharedPreferences("com.zeusinstitute.upiapp.preferences", Context.MODE_PRIVATE)
+        db = AppDatabase.getInstance(requireContext())
 
         setupRecyclerView()
-        setupExportButton()
-        setupClearButton()
+        setupButtons()
         loadTransactions()
 
         return view
@@ -58,88 +85,61 @@ class BillHistory : Fragment() {
 
     private fun setupRecyclerView() {
         recyclerView.layoutManager = LinearLayoutManager(context)
-        recyclerView.adapter = TransactionAdapter(transactions)
     }
 
-    private fun setupExportButton() {
-        exportButton.setOnClickListener {
-            exportToXml()
-        }
-    }
-
-    private fun setupClearButton() {
-        clearButton.setOnClickListener {
-            clearTransactions()
-        }
+    private fun setupButtons() {
+        exportButton.setOnClickListener { exportToXml() }
+        clearButton.setOnClickListener { clearTransactions() }
     }
 
     private fun loadTransactions() {
-        val smsEnabled = sharedPref.getBoolean("sms_enabled", false)
-        if (smsEnabled) {
-            // Get transactions from SMSService (you'll need a mechanism to do this)
-            val smsTransactions = getTransactionsFromSMSService()
-            transactions.addAll(smsTransactions)
-            recyclerView.adapter?.notifyDataSetChanged()
-        } else {
-            Toast.makeText(context, "Cannot take new elements, SMS scanning is disabled", Toast.LENGTH_SHORT).show()
-            // Load from persistent storage if SMS is disabled
-            loadTransactionsFromStorage()
-        }
-    }
+        val smsEnabled = requireActivity().getSharedPreferences("com.zeusinstitute.upiapp.preferences", Context.MODE_PRIVATE)
+            .getBoolean("sms_enabled", false)
 
-    private fun getTransactionsFromSMSService(): List<Transaction> {
-        // TODO: Implement logic to retrieve transactions from SMSService
-        // This might involve using a shared data store, broadcast receiver, etc.
-        return emptyList() // Replace with actual transaction retrieval
+        if (smsEnabled) {
+            warningText.visibility = View.GONE
+            lifecycleScope.launch {
+                val transactions = db.transactionDao().getAll()
+                recyclerView.adapter = TransactionAdapter(transactions)
+            }
+        } else {
+            warningText.visibility = View.VISIBLE
+            warningText.text = "Bill History is disabled, enable SMS in login page"
+            warningText.setTextColor(resources.getColor(android.R.color.holo_red_dark))
+        }
     }
 
     private fun exportToXml() {
-        context?.let { ctx ->
-            val xmlFile = File(ctx.getExternalFilesDir(null), "transactions.xml")
+        lifecycleScope.launch {
+            val transactions = db.transactionDao().getAll()
+            val xmlFile = File(requireContext().getExternalFilesDir(null), "transactions.xml")
             val serializer: XmlSerializer = Xml.newSerializer()
-            val writer = FileOutputStream(xmlFile).writer()
-
-            serializer.setOutput(writer)
-            serializer.startDocument("UTF-8", true)
-            serializer.startTag("", "transactions")
-
-            for (transaction in transactions) {
-                serializer.startTag("", "transaction")
-                serializer.attribute("", "type", if (transaction.isCredit) "credit" else "debit")
-                serializer.startTag("", "amount")
-                serializer.text(transaction.amount.toString())
-                serializer.endTag("", "amount")
-                serializer.startTag("", "from")
-                serializer.text(transaction.from)
-                serializer.endTag("", "from")
-                serializer.startTag("", "date")
-                serializer.text(transaction.date)
-                serializer.endTag("", "date")
-                serializer.endTag("", "transaction")
+            FileOutputStream(xmlFile).writer().use { writer ->
+                serializer.setOutput(writer)
+                serializer.startDocument("UTF-8", true)
+                serializer.startTag("", "transactions")
+                for (transaction in transactions) {
+                    serializer.startTag("", "transaction")
+                    serializer.attribute("", "type", transaction.type)
+                    serializer.startTag("", "amount")
+                    serializer.text(transaction.amount.toString())
+                    serializer.endTag("", "amount")
+                    serializer.startTag("", "date")
+                    serializer.text(transaction.date)
+                    serializer.endTag("", "date")
+                    serializer.endTag("", "transaction")
+                }
+                serializer.endTag("", "transactions")
+                serializer.endDocument()
             }
-
-            serializer.endTag("", "transactions")
-            serializer.endDocument()
-            writer.close()
-
-            // TODO: Show a success message to the user
         }
     }
+
     private fun clearTransactions() {
-        transactions.clear()
-        recyclerView.adapter?.notifyDataSetChanged()
-        clearTransactionsInStorage() // Clear from persistent storage as well
-        Toast.makeText(context, "Transactions cleared", Toast.LENGTH_SHORT).show()
-    }
-
-    // --- Persistent Storage Functions (You need to implement these) ---
-
-    private fun loadTransactionsFromStorage() {
-        // TODO: Load transactions from your chosen storage (e.g., Room database)
-    }
-
-    private fun clearTransactionsInStorage() {
-        // TODO: Clear transactions from your chosen storage
+        lifecycleScope.launch {
+            db.transactionDao().deleteAll()
+            loadTransactions()
+        }
     }
 }
 
@@ -148,9 +148,9 @@ class TransactionAdapter(private val transactions: List<Transaction>) :
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val amountTextView: TextView = view.findViewById(R.id.amountTextView)
-        val fromTextView: TextView = view.findViewById(R.id.fromTextView)
-        val dateTextView: TextView = view.findViewById(R.id.dateTextView)
+        val typeTextView: TextView = view.findViewById(R.id.typeTextView)
         val iconImageView: ImageView = view.findViewById(R.id.iconImageView)
+        val dateTextView: TextView = view.findViewById(R.id.dateTextView)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -162,16 +162,18 @@ class TransactionAdapter(private val transactions: List<Transaction>) :
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val transaction = transactions[position]
         holder.amountTextView.text = "Rs. ${transaction.amount}"
-        holder.fromTextView.text = transaction.from
+        holder.typeTextView.text = transaction.type
         holder.dateTextView.text = transaction.date
 
-        if (transaction.isCredit) {
-            holder.iconImageView.setImageResource(R.drawable.ic_credit) // You need to create this drawable
-            holder.amountTextView.setTextColor(Color.GREEN)
-        } else {
-            holder.iconImageView.setImageResource(R.drawable.ic_debit) // You need to create this drawable
-            holder.amountTextView.setTextColor(Color.RED)
-        }
+        holder.iconImageView.setImageResource(
+            if (transaction.type == "Credit") R.drawable.ic_credit else R.drawable.ic_debit
+        )
+
+        holder.amountTextView.setTextColor(
+            ContextCompat.getColor(holder.itemView.context,
+                if (transaction.type == "Credit") android.R.color.holo_green_dark else android.R.color.holo_red_dark
+            )
+        )
     }
 
     override fun getItemCount() = transactions.size
