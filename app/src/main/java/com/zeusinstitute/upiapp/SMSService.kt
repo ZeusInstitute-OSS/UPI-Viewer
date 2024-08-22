@@ -18,8 +18,7 @@ import androidx.core.app.NotificationCompat
 import java.util.*
 import java.util.concurrent.LinkedBlockingQueue
 import kotlinx.coroutines.*
-import androidx.room.Room
-import java.text.import androidx.room.Room
+import androidx.room.*
 import java.text.SimpleDateFormat
 
 class SMSService : Service(), TextToSpeech.OnInitListener {
@@ -75,7 +74,7 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
         registerReceiver(smsReceiver, IntentFilter(Telephony.Sms.Intents.SMS_RECEIVED_ACTION))
         startMessageProcessing()
 
-        db = AppDatabase.getInstance(this)
+        db = AppDatabase.getInstance(applicationContext)
 
         val filter = IntentFilter(STOP_SERVICE)
         registerReceiver(stopReceiver, filter)
