@@ -15,6 +15,7 @@ import android.widget.TextView
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.WriterException
 import com.journeyapps.barcodescanner.BarcodeEncoder
@@ -33,6 +34,7 @@ class FirstFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeList
     private lateinit var sharedPref: SharedPreferences
     private lateinit var paymentMethod: String
     private lateinit var smsStatusTextView: TextView
+    private lateinit var loginButton: com.google.android.material.floatingactionbutton.FloatingActionButton
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -57,8 +59,14 @@ class FirstFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeList
         sharedPref = requireActivity().getPreferences(Context.MODE_PRIVATE)
         sharedPref.registerOnSharedPreferenceChangeListener(this) // Register listener
 
+        loginButton = view.findViewById(R.id.loginButton)
+
         updateQRCode() // Generate QR code initially
         updateSmsStatus()
+
+        loginButton.setOnClickListener {
+            findNavController().navigate(R.id.action_firstFragment_to_login)
+        }
     }
 
     override fun onResume() {
