@@ -12,6 +12,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.Spinner
 import android.widget.TextView
+import android.widget.Toast
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
@@ -20,6 +21,7 @@ import com.google.zxing.BarcodeFormat
 import com.google.zxing.WriterException
 import com.journeyapps.barcodescanner.BarcodeEncoder
 import com.zeusinstitute.upiapp.databinding.FragmentFirstBinding
+import kotlin.math.min
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
@@ -35,6 +37,9 @@ class FirstFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeList
     private lateinit var paymentMethod: String
     private lateinit var smsStatusTextView: TextView
     private lateinit var loginButton: com.google.android.material.floatingactionbutton.FloatingActionButton
+    private lateinit var customAmountButton: com.google.android.material.floatingactionbutton.FloatingActionButton
+    private lateinit var splitBillButton: com.google.android.material.floatingactionbutton.FloatingActionButton
+    private lateinit var updateAppButton: com.google.android.material.floatingactionbutton.FloatingActionButton
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -60,12 +65,42 @@ class FirstFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeList
         sharedPref.registerOnSharedPreferenceChangeListener(this) // Register listener
 
         loginButton = view.findViewById(R.id.loginButton)
+        customAmountButton = view.findViewById(R.id.customAmountButton)
+        splitBillButton = view.findViewById(R.id.splitBillButton)
+        updateAppButton = view.findViewById(R.id.updateAppButton)
 
         updateQRCode() // Generate QR code initially
         updateSmsStatus()
 
         loginButton.setOnClickListener {
             findNavController().navigate(R.id.action_firstFragment_to_login)
+        }
+        customAmountButton.setOnClickListener {
+            findNavController().navigate(R.id.action_firstFragment_to_dynamicFragment)
+        }
+        splitBillButton.setOnClickListener {
+            findNavController().navigate(R.id.action_firstFragment_to_splitBillFragment)
+        }
+        updateAppButton.setOnClickListener {
+            findNavController().navigate(R.id.action_firstFragment_to_Update)
+        }
+        loginButton.setOnLongClickListener {
+            Toast.makeText(context, "Set UPI Id", Toast.LENGTH_SHORT).show()
+            true // Consume the long click
+        }
+        customAmountButton.setOnLongClickListener {
+            Toast.makeText(context, "Custom Amount", Toast.LENGTH_SHORT).show()
+            true // Consume the long click
+        }
+
+        splitBillButton.setOnLongClickListener {
+            Toast.makeText(context, "Split the Bill", Toast.LENGTH_SHORT).show()
+            true // Consume the long click
+        }
+
+        updateAppButton.setOnLongClickListener {
+            Toast.makeText(context, "Check for App Updates", Toast.LENGTH_SHORT).show()
+            true // Consume the long click
         }
     }
 
@@ -99,9 +134,11 @@ class FirstFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeList
 
     private fun generateQRCode(text: String, imageView: ImageView) {
         val barcodeEncoder = BarcodeEncoder()
-        try {
-            val bitmap: Bitmap = barcodeEncoder.encodeBitmap(text, BarcodeFormat.QR_CODE, 400, 400)
+        try {// Generate a high-resolution QR code (adjust size as needed)
+            val bitmap: Bitmap = barcodeEncoder.encodeBitmap(text, BarcodeFormat.QR_CODE, 800, 800)
             imageView.setImageBitmap(bitmap)
+            imageView.scaleType = ImageView.ScaleType.FIT_CENTER // Let ImageView handle scaling
+            imageView.setPadding(0, 0, 0, 0)
         } catch (e: WriterException) {
             e.printStackTrace()
         }
