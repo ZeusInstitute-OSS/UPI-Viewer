@@ -3,11 +3,14 @@
 package com.zeusinstitute.upiapp
 
 import android.Manifest
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.speech.tts.Voice
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -24,6 +27,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import com.zeusinstitute.upiapp.VoiceInfo
 
 class Login : Fragment() {
     private lateinit var countrySpinner: Spinner
@@ -34,7 +38,24 @@ class Login : Fragment() {
     private lateinit var rulesTextView: TextView
     private lateinit var smsSwitch: SwitchCompat
 
+    private lateinit var voiceSpinner: Spinner
+    private var selectedVoice: Voice? = null
+
     private val SMS_PERMISSION_REQUEST_CODE = 101
+
+    private val ttsReadyReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            if (intent?.action == "com.zeusinstitute.upiapp.TTS_READY") {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    val voiceInfoList = intent.getParcelableArrayListExtra<VoiceInfo>("voices") ?: emptyList()
+                    setupVoiceSpinner(voiceInfoList)
+                } else {
+                    // Handle pre-Lollipop (if needed) - you'll need a different approach here
+                    voiceSpinner.isEnabled = false // Disable for now
+                }
+            }
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,6 +71,17 @@ class Login : Fragment() {
         // Prepare smsSwitch
         smsSwitch = view.findViewById(R.id.smsSwitch)
         initializeSmsToggle()
+
+        // Select Voice for TTS
+        voiceSpinner = view.findViewById(R.id.voiceSpinner)
+
+        // Register the broadcast receiver
+        val filter = IntentFilter("com.zeusinstitute.upiapp.TTS_READY")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                requireContext().registerReceiver(ttsReadyReceiver, filter, Context.RECEIVER_NOT_EXPORTED)
+        } else {
+            requireContext().registerReceiver(ttsReadyReceiver, filter)
+        }
 
         countrySpinner = view.findViewById(R.id.countrySpinner)
         paymentMethodSpinner = view.findViewById(R.id.paymentMethodSpinner)
@@ -100,6 +132,12 @@ class Login : Fragment() {
         //smsSwitch.isChecked = smsEnabled
         return view
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        requireContext().unregisterReceiver(ttsReadyReceiver)
+    }
+
     private fun initializeSmsToggle() {
         val sharedPref = requireActivity().getPreferences(Context.MODE_PRIVATE)
         val isFirstTime = sharedPref.getBoolean("first_time", true)
@@ -213,6 +251,33 @@ class Login : Fragment() {
         val adapter =
             ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, currencies)
         currencySpinner.adapter = adapter
+    }
+
+    private fun setupVoiceSpinner(voiceInfoList: List<VoiceInfo>) {
+        val voiceDisplayList = voiceInfoList.map { "${it.gender} - ${it.country} - ${it.language}" }
+        val voiceAdapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_spinner_item,
+            voiceDisplayList
+        )
+        voiceAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        voiceSpinner.adapter = voiceAdapter
+
+        // Set a listener for voice selection
+        voiceSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                val selectedVoiceInfo = voiceInfoList.getOrNull(position)
+                val sharedPref = requireActivity().getPreferences(Context.MODE_PRIVATE)
+                with(sharedPref.edit()) {
+                    putString("selected_voice", selectedVoiceInfo?.name) // Store selected voice name
+                    apply()
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                selectedVoice = null
+            }
+        }
     }
 
     private fun handleSubmit() {
