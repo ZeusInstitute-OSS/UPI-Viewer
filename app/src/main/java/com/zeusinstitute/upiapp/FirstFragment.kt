@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.graphics.Color
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,6 +14,7 @@ import android.widget.ImageView
 import android.widget.Spinner
 import android.widget.TextView
 import android.widget.Toast
+import androidx.constraintlayout.widget.ConstraintSet
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
@@ -48,6 +50,20 @@ class FirstFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeList
         _binding = FragmentFirstBinding.inflate(inflater, container, false)
         qrCodeImageView = binding.qrCodeImageView
         smsStatusTextView = binding.smsStatusTextView
+
+        // Deal with Small Screens
+        val displayMetrics = resources.displayMetrics
+        val screenWidth = displayMetrics.widthPixels
+        val screenHeight = displayMetrics.heightPixels
+        val aspectRatio = screenHeight.toFloat()/ screenWidth.toFloat()
+
+        val constraintSet = ConstraintSet()
+        constraintSet.clone(binding.root)
+
+        Log.d("DisplayDetails", "screenWidth = ${screenWidth} and screenHeight=${screenHeight}")
+        val heightPercent = if (aspectRatio > 16f / 9f) 0.6f else 0.5f
+        constraintSet.constrainPercentHeight(R.id.qrCodeImageView, heightPercent)
+        constraintSet.applyTo(binding.root)
 
         // Make status bar transparent (conditionally for Lollipop and above)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {

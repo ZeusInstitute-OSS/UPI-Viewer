@@ -188,7 +188,7 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
         val notificationBuilder = NotificationCompat.Builder(this, notificationChannelId)
             .setContentTitle("UPI Credit")
             .setContentText(message)
-            .setSmallIcon(R.mipmap.ic_launcher)
+            .setSmallIcon(R.drawable.qr_code_2_24px)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
 
@@ -207,7 +207,7 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
         val notificationBuilder = NotificationCompat.Builder(this, notificationChannelId)
             .setContentTitle("UPI Speaker Mode")
             .setContentText("Service is running")
-            .setSmallIcon(R.mipmap.ic_launcher)
+            .setSmallIcon(R.drawable.qr_code_2_24px)
             .setContentIntent(pendingIntent)
 
         return notificationBuilder.build()
