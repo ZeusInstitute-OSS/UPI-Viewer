@@ -105,7 +105,7 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
             startForeground(notificationId, createNotification())
         } else {
             // For older Android versions, show a regular notification
-            showNotification("UPI Speaker Mode is running")
+            showNotification("UPI Speaker Mode started")
         }
     }
 
