@@ -61,7 +61,7 @@ class FirstFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeList
         constraintSet.clone(binding.root)
 
         Log.d("DisplayDetails", "screenWidth = ${screenWidth} and screenHeight=${screenHeight}")
-        val heightPercent = if (aspectRatio > 16f / 9f) 0.6f else 0.5f
+        val heightPercent = if (aspectRatio >= 16f / 9f) 0.6f else 0.5f
         constraintSet.constrainPercentHeight(R.id.qrCodeImageView, heightPercent)
         constraintSet.applyTo(binding.root)
 
