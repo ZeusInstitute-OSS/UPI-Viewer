@@ -42,6 +42,7 @@ class FirstFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeList
     private lateinit var customAmountButton: com.google.android.material.floatingactionbutton.FloatingActionButton
     private lateinit var splitBillButton: com.google.android.material.floatingactionbutton.FloatingActionButton
     private lateinit var updateAppButton: com.google.android.material.floatingactionbutton.FloatingActionButton
+    private lateinit var checkWalletButton: com.google.android.material.floatingactionbutton.FloatingActionButton
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -84,6 +85,7 @@ class FirstFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeList
         customAmountButton = view.findViewById(R.id.customAmountButton)
         splitBillButton = view.findViewById(R.id.splitBillButton)
         updateAppButton = view.findViewById(R.id.updateAppButton)
+        checkWalletButton = view.findViewById(R.id.checkWalletButton)
 
         updateQRCode() // Generate QR code initially
         updateSmsStatus()
@@ -96,6 +98,9 @@ class FirstFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeList
         }
         splitBillButton.setOnClickListener {
             findNavController().navigate(R.id.action_firstFragment_to_splitBillFragment)
+        }
+        checkWalletButton.setOnClickListener {
+            findNavController().navigate(R.id.action_firstFragment_to_billHistory)
         }
         updateAppButton.setOnClickListener {
             findNavController().navigate(R.id.action_firstFragment_to_Update)

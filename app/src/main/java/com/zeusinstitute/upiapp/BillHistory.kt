@@ -11,6 +11,7 @@ import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
@@ -19,6 +20,9 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavController
+import androidx.navigation.findNavController
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.ItemTouchHelper.RIGHT
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -310,6 +314,33 @@ class BillHistory : Fragment() {
                 warningTextView.text = ""
                 warningTextView.visibility = View.GONE
             }
+        }
+    }
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        val navController = findNavController()
+        return when (item.itemId) {
+            R.id.log_in -> navController.navigateSafely(R.id.login)
+            R.id.AboutApp -> navController.navigateSafely(R.id.AboutApp)
+            R.id.SplitBill -> navController.navigateSafely(R.id.splitBillFragment)
+            R.id.billHistory -> true // We're already on this fragment
+            R.id.DynUPI -> navController.navigateSafely(R.id.dynamicFragment)
+            R.id.Update -> navController.navigateSafely(R.id.Update)
+            android.R.id.home -> {
+                navController.navigateUp()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    // Extension function to safely navigate
+    private fun NavController.navigateSafely(destinationId: Int): Boolean {
+        return try {
+            navigate(destinationId)
+            true
+        } catch (e: IllegalArgumentException) {
+            Log.e("Navigation", "Unable to navigate to $destinationId", e)
+            false
         }
     }
 }

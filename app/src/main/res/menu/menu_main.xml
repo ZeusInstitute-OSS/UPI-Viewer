@@ -6,9 +6,12 @@
         android:enabled="true"
         android:id="@+id/DynUPI"
         android:title="Recieve UPI" />
-    <item android:title="Recieve Card" />
-    <item android:title="Send UPI" />
-    <item android:title="Send Card" />
+    <item android:title="Recieve Card"
+        android:visible="false"/>
+    <item android:title="Send UPI"
+        android:visible="false"/>
+    <item android:title="Send Card"
+        android:visible="false"/>
     <item android:title="More Options" >
         <menu >
             <item
@@ -19,9 +22,12 @@
                 android:title="Payment History" />
         </menu>
     </item>
-    <item android:title="Hardware" ></item>
-    <item android:title="Addon Settings" />
-    <item android:title="Change Profile" />
+    <item android:title="Hardware"
+        android:visible="false"/>
+    <item android:title="Addon Settings"
+        android:visible="false"/>
+    <item android:title="Change Profile"
+        android:visible="false"/>
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
