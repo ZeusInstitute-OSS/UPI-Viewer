@@ -89,7 +89,7 @@
             android:id="@+id/customAmountButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
+            android:layout_marginEnd="10dp"
             android:clickable="true"
             app:srcCompat="@drawable/currency_rupee_24px" />
 
@@ -97,7 +97,7 @@
             android:id="@+id/splitBillButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
+            android:layout_marginEnd="10dp"
             android:clickable="true"
             app:srcCompat="@drawable/receipt_long_24px" />
 
@@ -105,7 +105,7 @@
             android:id="@+id/checkWalletButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="16dp"
+            android:layout_marginEnd="10dp"
             android:clickable="true"
             android:src="@drawable/wallet_24px" />
 
