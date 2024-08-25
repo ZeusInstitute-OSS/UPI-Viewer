@@ -211,6 +211,11 @@ class BillHistory : Fragment() {
         return view
     }
 
+    override fun onResume() {
+        super.onResume()
+        refreshData()
+    }
+
     private fun exportTransactionsToXML(transactions: List<PayTransaction>) {
         try {
             val docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
