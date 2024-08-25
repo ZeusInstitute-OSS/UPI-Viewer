@@ -1,6 +1,7 @@
 package com.zeusinstitute.upiapp
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
@@ -21,4 +22,7 @@ interface TransactionDao {
 
     @Query("SELECT * FROM PayTransaction ORDER BY date DESC")
     fun getAllTransactionsOrderedByDate(): Flow<List<PayTransaction>>
+
+    @Delete
+    fun delete(transaction: PayTransaction): Int
 }
