@@ -119,6 +119,11 @@ class FirstFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeList
             true // Consume the long click
         }
 
+        checkWalletButton.setOnLongClickListener {
+            Toast.makeText(context, "Check Transaction History", Toast.LENGTH_SHORT).show()
+            true // Consume the long click
+        }
+
         updateAppButton.setOnLongClickListener {
             Toast.makeText(context, "Check for App Updates", Toast.LENGTH_SHORT).show()
             true // Consume the long click
