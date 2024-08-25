@@ -30,7 +30,7 @@
         app:layout_constraintHeight_percent="0.6"
         app:layout_constraintStart_toEndOf="@+id/startGuideline"
         app:layout_constraintTop_toBottomOf="@+id/smsStatusTextView"
-        tools:src="@tools:sample/backgrounds/scenic[2]" />
+        tools:src="@drawable/upiid" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/startGuideline"
