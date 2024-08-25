@@ -104,8 +104,14 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
             createNotificationChannel() // Create channel before starting foreground
             startForeground(notificationId, createNotification())
         } else {
-            // For older Android versions, show a regular notification
-            showNotification("UPI Speaker Mode started")
+            // For older Android versions (Jelly Bean and KitKat), show a regular notification
+            val notification = NotificationCompat.Builder(this)
+                .setContentTitle("UPI Speaker Mode")
+                .setContentText("Service is running")
+                .setSmallIcon(R.drawable.qr_code_2_24px)
+                .setContentIntent(PendingIntent.getActivity(this, 0, Intent(this, MainActivity::class.java), 0))
+                .build()
+            startForeground(notificationId, notification) // Start in foreground for Jelly Bean and KitKat
         }
     }
 
@@ -183,28 +189,38 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
 
     private fun showNotification(message: String) {
         val intent = Intent(this, MainActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
-
-        val notificationBuilder = NotificationCompat.Builder(this, notificationChannelId)
-            .setContentTitle("UPI Credit")
-            .setContentText(message)
-            .setSmallIcon(R.drawable.qr_code_2_24px)
-            .setContentIntent(pendingIntent)
-            .setAutoCancel(true)
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            notificationManager.notify(notificationId, notificationBuilder.build())
+        val pendingIntentFlags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
         } else {
-            @Suppress("DEPRECATION")
-            notificationManager.notify(notificationId, notificationBuilder.build())
+            PendingIntent.FLAG_UPDATE_CURRENT
         }
+        val pendingIntent = PendingIntent.getActivity(this, 0, intent, pendingIntentFlags)
+
+        val notificationBuilder =
+            NotificationCompat.Builder(this) // No channel ID for older versions
+                .setContentTitle("UPI Credit")
+                .setContentText(message)
+                .setSmallIcon(R.drawable.qr_code_2_24px)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
+
+        notificationManager.notify(notificationId, notificationBuilder.build())
     }
 
     private fun createNotification(): android.app.Notification {
         val intent = Intent(this, MainActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+        val pendingIntentFlags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        } else {
+            PendingIntent.FLAG_UPDATE_CURRENT
+        }
+        val pendingIntent = PendingIntent.getActivity(this, 0, intent, pendingIntentFlags)
 
-        val notificationBuilder = NotificationCompat.Builder(this, notificationChannelId)
+        val notificationBuilder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            NotificationCompat.Builder(this, notificationChannelId)
+        } else {
+            NotificationCompat.Builder(this) // No channel ID for older versions
+        }
             .setContentTitle("UPI Speaker Mode")
             .setContentText("Service is running")
             .setSmallIcon(R.drawable.qr_code_2_24px)
@@ -212,8 +228,6 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
 
         return notificationBuilder.build()
     }
-
-
 
     private fun createNotificationChannel() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) { // Check SDK version
