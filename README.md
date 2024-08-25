@@ -1,5 +1,17 @@
-# untitled-upi-for-android-4
-UPI and card POS system for android 4 and above. 
+# Upi Viewer
+Open Source UPI (and eventually card) POS system for android 4 and above. 
+
+Make your old android phones into UPI Powered Point Of Sale devices!
+
+Features:
+- Custom UPI ID
+- Static QR on Main Screen
+- Dynamic QR with custom amount
+- Split the Bill mode for multiple payees
+- Quick Updater
+- SMS based bill tracker
+- Announce transaction amount sent/recieved through Voice when enabled
+- Open Source
 
 ### Build Status:
 [![Android CI](https://github.com/Zeus-Institute-of-Technology-Solutions/untitled-upi-for-android-4/actions/workflows/main.yml/badge.svg)](https://github.com/Zeus-Institute-of-Technology-Solutions/untitled-upi-for-android-4/actions/workflows/main.yml)
@@ -34,7 +46,7 @@ UPI and card POS system for android 4 and above.
 	- Dynamic Works
 	- Split The Bill Works
 	
-If you know any countries that use a simple URL like India does (upi://...), pleas let me know and I can try to add support.
+If you know any countries that use a simple URL like India does (upi://...), please let me know and I can try to add support.
 
 ### Original Mockup
 
@@ -46,6 +58,10 @@ June 16, 2023
 
 ### Demo
 Here's a fediverse post with a video demo of the app!
+
+Aug 23, 2024
+
+https://infosec.exchange/@sounddrill/113012241826070113
 
 Aug 18, 2024
 
