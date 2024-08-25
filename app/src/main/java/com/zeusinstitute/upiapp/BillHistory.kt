@@ -1,7 +1,10 @@
 package com.zeusinstitute.upiapp
 
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -10,6 +13,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -27,6 +31,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
+import java.io.File
 
 class BillHistory : Fragment() {
     private lateinit var transactionRecyclerView: RecyclerView
@@ -60,7 +65,7 @@ class BillHistory : Fragment() {
 
         refreshButton.setOnClickListener {
             refreshData()
-         }
+        }
 
         clearButton.setOnClickListener {
             lifecycleScope.launch {
@@ -78,26 +83,41 @@ class BillHistory : Fragment() {
         }*/
 
         exportButton.setOnClickListener {
-            lifecycleScope.launch {
-                val transactions = withContext(Dispatchers.IO) { // Fetch transactions on IO thread
-                    transactionDao.getAllTransactions()
+            exportButton.setOnClickListener {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) { //Correct casing for Build
+                    lifecycleScope.launch {
+                        val transactions = withContext(Dispatchers.IO) {
+                            transactionDao.getAllTransactions()
+                        }
+                        exportTransactionsToXML(transactions)
+                        Log.d(
+                            "BillHistory",
+                            "Export button pressed, exporting to XML"
+                        )// Clarify log message
+                    }
+                } else {
+                    // Handle the case for devices below KitKat
+                    Toast.makeText(
+                        requireContext(),
+                        "Export is not supported on devices older than Android 4.4",
+                        Toast.LENGTH_SHORT
+                    ).show() // Use Toast properly
                 }
-                exportTransactionsToXML(transactions) // Call export function on main thread}
-                Log.d("BillHistory", "Export button pressed for exporting into database") // Log insertion
             }
-        }
 
-        lifecycleScope.launch {
-            Log.d("BillHistory", "Attempting to read transactions from database")
-            transactionDao.getAll()
-                .flowOn(Dispatchers.IO) // Switch Flow collection to IO thread
-                .collect { transactions ->
-                    adapter.submitList(transactions) // Update adapter on main thread
-                    Log.d("BillHistory", "Fetched ${transactions.size} transactions")
-                }
+            lifecycleScope.launch {
+                Log.d("BillHistory", "Attempting to read transactions from database")
+                transactionDao.getAll()
+                    .flowOn(Dispatchers.IO)
+                    .collect { transactions ->
+                        adapter.submitList(transactions)
+                        Log.d("BillHistory", "Fetched ${transactions.size} transactions")
+                    }
+            }
         }
         return view
     }
+
     private fun exportTransactionsToXML(transactions: List<PayTransaction>) {
         try {
             val docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder()
@@ -136,12 +156,48 @@ class BillHistory : Fragment() {
             val xmlString = writer.toString()
 
             // TODO: Save the xmlString to a file or share it as needed
+            saveXMLToFile(xmlString)
             println(xmlString) // Print XML to console for now
         } catch (e: Exception) {
             // Handle exceptions during XML creation
             e.printStackTrace()
         }
     }
+
+    private fun saveXMLToFile(xmlString: String) {
+        // Store the XML string in a temporary variable for later use
+        tempXmlString = xmlString
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            // For KitKat and above, use ACTION_CREATE_DOCUMENT
+            val intent = Intent(Intent.ACTION_CREATE_DOCUMENT).apply {
+                addCategory(Intent.CATEGORY_OPENABLE)
+                type = "text/xml"
+                putExtra(Intent.EXTRA_TITLE, "transactions.xml")
+            }
+            startActivityForResult(intent, CREATE_FILE_REQUEST_CODE)
+        }
+    }
+
+    // Request code for creating a file (used for KitKat and above)
+    private val CREATE_FILE_REQUEST_CODE = 1
+
+    // Temporary variable to store the XML string
+    private var tempXmlString: String? = null
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == CREATE_FILE_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+            data?.data?.let { uri ->
+                context?.contentResolver?.openOutputStream(uri)?.use { outputStream ->
+                    outputStream.write(tempXmlString?.toByteArray())
+                    Toast.makeText(context, "Transactions exported to XML", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
     private fun refreshData() {
         val sharedPref = requireActivity().getPreferences(Context.MODE_PRIVATE)
         val smsEnabled = sharedPref.getBoolean("sms_enabled", false)
