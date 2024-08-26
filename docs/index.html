@@ -139,16 +139,21 @@
 
         .download {
             text-align: center;
-            margin-top: 40px;
-            margin-bottom: 60px; /* Add margin to the bottom */
-            display: flex;
+            margin-top: 60px;
+            margin-bottom: 60px;
+            flex-direction: column;
             flex-wrap: wrap;
-            justify-content: space-around;
+            align-items: center; 
+            justify-content: center;
+            gap: 20px; /* Add some gap between buttons */
         }
         
         .download a {
-            flex-basis: 45%;
+            flex-basis: calc(50% - 10px); /* Ensure two buttons per row with spacing */
+            max-width: 300px; /* Add a max-width to limit the button length */
+            padding: 15px 30px; 
             text-align: center;
+            margin: 0 10px; 
         }
 
         .features {
@@ -166,29 +171,29 @@
         }
 
         .download-btn {
-            display: inline-flex;
-            align-items: center;
-            background-color: var(--accent-color);
-            color: #ffffff;
-            text-decoration: none;
-            padding: 15px 30px;
-            border-radius: 50px;
-            margin: 0 15px 20px;
-            transition: background-color 0.3s, transform 0.3s;
-            font-weight: bold;
-        }
+    display: inline-flex;
+    align-items: center;
+    background-color: var(--accent-color);
+    color: #ffffff;
+    text-decoration: none;
+    padding: 15px 30px;
+    border-radius: 50px;
+    transition: background-color 0.3s, transform 0.3s;
+    font-weight: bold;
+    width: 100%; /* Make buttons take full width of their container */
+    box-sizing: border-box; /* Ensure padding is included in width calculation */
+}
+    .download-btn:hover {
+        background-color: #3a7bc8;
+        transform: translateY(-3px);
+    }
 
-        .download-btn:hover {
-            background-color: #3a7bc8;
-            transform: translateY(-3px);
-        }
-
-        .download-btn i {
-            font-size: 24px;
-            margin-right: 10px;
-        }
-
-        .dark-mode {
+    .download-btn i {
+        font-size: 24px;
+        margin-right: 10px;
+    }
+    
+    .dark-mode {
             --bg-color: #1a1a1a;
             --text-color: #ffffff;
             --accent-color: #64b5f6;
@@ -201,6 +206,10 @@
                 height: auto;
                 aspect-ratio: 9 / 16;
             }
+            .download a {
+        flex-basis: 100%; /* Make buttons stack in single column on small screens */
+        max-width: 100%; /* Allow buttons to take up full width */
+    }
         }
     </style>
 </head>
@@ -218,7 +227,7 @@
             <h2>Download UPI Viewer</h2>
             <a href="#" class="download-btn">
                 <i class="fa-brands fa-google-play"></i>
-                Google Play Store
+                Play Store
                 (Coming Soon)
             </a>
             <a href="#" class="download-btn">
