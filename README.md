@@ -34,7 +34,7 @@ Features:
 6. Selecting the right license for the project : ✅
 7. Signed APKs : ✅
 8. Auto-Update : ✅
-9. SemVer Releases : ❌
+9. Well Versioned Releases : *️⃣
 10. Support addon hardware : ❌
 11. Other Countries : *️⃣
 12. A Bill Handling System for Payment History : ✅
@@ -49,6 +49,31 @@ Features:
 	
 If you know any countries that use a simple URL like India does (upi://...), please let me know and I can try to add support.
 
+### Versioning:
+
+It's a small project.
+#### Stable:
+Naming Scheme:
+- Major (M): Significant changes, new features, or any other updates that are considered substantial
+- Minor (m): All other updates, including small improvements, tweaks, and bug fixes
+
+##### Version Bump format for reference:
+Title:
+```
+Bump to Version Major.Minor
+```
+Commit Message:
+```
+Changelog:
+- Fixed SMS issue <github issue link>
+- Small UI Improvements
+
+[skip ci]
+```
+#### Unstable:
+Naming Scheme:
+- Bleeding Edge RunID DDMMYYYY
+Where RunID is replaced by the Run ID of github actions. 
 ### Original Mockup
 
 Start of the journey! [Commit](https://github.com/ZeusInstitute-OSS/UPI-Viewer/commit/c68d24024b69288a7b27d72a8c40747f7f5033fd)
