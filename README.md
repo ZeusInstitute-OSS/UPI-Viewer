@@ -34,7 +34,7 @@ Features:
 6. Selecting the right license for the project : ✅
 7. Signed APKs : ✅
 8. Auto-Update : ✅
-9. SemVer Releases : ❌
+9. Well Versioned Releases : *️⃣
 10. Support addon hardware : ❌
 11. Other Countries : *️⃣
 12. A Bill Handling System for Payment History : ✅
