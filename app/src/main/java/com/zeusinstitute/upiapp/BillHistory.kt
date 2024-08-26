@@ -321,22 +321,6 @@ class BillHistory : Fragment() {
             }
         }
     }
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        val navController = findNavController()
-        return when (item.itemId) {
-            R.id.log_in -> navController.navigateSafely(R.id.login)
-            R.id.AboutApp -> navController.navigateSafely(R.id.AboutApp)
-            R.id.SplitBill -> navController.navigateSafely(R.id.splitBillFragment)
-            R.id.billHistory -> true // We're already on this fragment
-            R.id.DynUPI -> navController.navigateSafely(R.id.dynamicFragment)
-            R.id.Update -> navController.navigateSafely(R.id.Update)
-            android.R.id.home -> {
-                navController.navigateUp()
-                true
-            }
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
 
     // Extension function to safely navigate
     private fun NavController.navigateSafely(destinationId: Int): Boolean {
