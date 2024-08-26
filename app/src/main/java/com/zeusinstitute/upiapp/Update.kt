@@ -2,6 +2,7 @@ package com.zeusinstitute.upiapp
 
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -46,14 +47,20 @@ class UpdateFragment : Fragment() {
         installButton.visibility = View.GONE // Initially hide the install button
 
         checkUpdateButton.setOnClickListener {
-                if (buildRunId == 0L) {
-                    Toast.makeText(context, "Updating is disabled", Toast.LENGTH_SHORT).show()
-                } else {
-                    lifecycleScope.launch {
-                        checkForUpdate()
-                    }
+            when (buildRunId) {
+                0L -> Toast.makeText(context, "Updating is disabled", Toast.LENGTH_SHORT).show()
+                47529L -> { // "gplay" encoded in T9 SMS format
+                // Try to open the Play Store listing for your app
+                try {
+                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=${requireContext().packageName}")))
+                } catch (e: ActivityNotFoundException) {
+                    // Handle cases where the Play Store app is not installed
+                    Toast.makeText(context, "Play Store not found", Toast.LENGTH_SHORT).show()
                 }
             }
+                else -> lifecycleScope.launch { checkForUpdate() }
+            }
+        }
 
         return view
     }
