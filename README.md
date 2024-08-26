@@ -49,6 +49,31 @@ Features:
 	
 If you know any countries that use a simple URL like India does (upi://...), please let me know and I can try to add support.
 
+### Versioning:
+
+It's a small project.
+#### Stable:
+Naming Scheme:
+- Major (M): Significant changes, new features, or any other updates that are considered substantial
+- Minor (m): All other updates, including small improvements, tweaks, and bug fixes
+
+##### Version Bump format for reference:
+Title:
+```
+Bump to Version Major.Minor
+```
+Commit Message:
+```
+Changelog:
+- Fixed SMS issue <github issue link>
+- Small UI Improvements
+
+[skip ci]
+```
+#### Unstable:
+Naming Scheme:
+- Bleeding Edge RunID DDMMYYYY
+Where RunID is replaced by the Run ID of github actions. 
 ### Original Mockup
 
 Start of the journey! [Commit](https://github.com/ZeusInstitute-OSS/UPI-Viewer/commit/c68d24024b69288a7b27d72a8c40747f7f5033fd)
