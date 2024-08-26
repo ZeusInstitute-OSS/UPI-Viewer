@@ -66,7 +66,7 @@ jobs:
       with:
         file: |
           app/build/outputs/apk/*/*.apk
-        default_release_name: Bleeding Edge ${{ github.run_id }} ${{ format('{0,date,ddMMyyyy}', github.event.head_commit.timestamp) }}
+        default_release_name: Bleeding Edge ${{ github.run_id }} ${{ github.event.head_commit.timestamp }}
         tag_name: ${{ github.run_id }} 
         draft: false
       env:

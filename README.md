@@ -72,7 +72,7 @@ Changelog:
 ```
 #### Unstable:
 Naming Scheme:
-- Bleeding Edge RunID DDMMYYYY
+- Bleeding Edge RunID DATE
 Where RunID is replaced by the Run ID of github actions. 
 ### Original Mockup
 
