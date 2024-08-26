@@ -40,6 +40,7 @@ Features:
 12. A Bill Handling System for Payment History : ✅
 13. Retail Mode With USB/Network PC Support : ❌
 14. Initial App Store release: *️⃣
+15. Basic Website: *️⃣
 
 ### Supported Countries:
 1. India
