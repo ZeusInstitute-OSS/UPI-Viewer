@@ -23,6 +23,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityMainBinding
     private val NOTIFICATION_PERMISSION_REQUEST_CODE = 102
+    private val navController by lazy { findNavController(R.id.nav_host_fragment_content_main) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -34,6 +35,10 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         appBarConfiguration = AppBarConfiguration(navController.graph)
         setupActionBarWithNavController(navController, appBarConfiguration)
+
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            invalidateOptionsMenu() // Invalidate options menu on destination change
+        }
 
         // Start SMS service if enabled
         val sharedPref = getPreferences(Context.MODE_PRIVATE)
@@ -54,7 +59,20 @@ class MainActivity : AppCompatActivity() {
                 )
             }
         }
+    }
+    override fun onPrepareOptionsMenu(menu: Menu): Boolean {
+        val isOnFirstFragment = navController.currentDestination?.id == R.id.firstFragment // Check if on FirstFragment
+        menu.setGroupVisible(R.id.main_menu_group, isOnFirstFragment) // Show/hide menu items based on fragment
+        if (isOnFirstFragment) {
+            menu.findItem(R.id.Profile).isVisible = false
+            menu.findItem(R.id.Addons).isVisible = false
+            menu.findItem(R.id.hw).isVisible = false
+            menu.findItem(R.id.SendCard).isVisible = false
+            menu.findItem(R.id.SendUPI).isVisible = false
+            menu.findItem(R.id.RecCard).isVisible = false
         }
+        return super.onPrepareOptionsMenu(menu)
+    }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
