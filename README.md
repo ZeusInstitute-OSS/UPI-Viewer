@@ -26,7 +26,7 @@ Features:
 
 
 ### Basic prototype:
-1. SMS TTS(send/receive) : ✅ (Needs Testing on Pre-Kitkat Phones, Works well kitkat onwards!) 
+1. SMS TTS(send/receive) : ✅
 2. QR Scanning: ✅
 3. Dynamic QR With Price : ✅
 4. Split the Bill mode : ✅
@@ -37,8 +37,9 @@ Features:
 9. SemVer Releases : ❌
 10. Support addon hardware : ❌
 11. Other Countries : *️⃣
-12. A Bill Handling System for Payment History : ✅ (Needs Testing on Pre-Kitkat Phones, Works well kitkat onwards!)
+12. A Bill Handling System for Payment History : ✅
 13. Retail Mode With USB/Network PC Support : ❌
+14. Initial App Store release: *️⃣
 
 ### Supported Countries:
 1. India
