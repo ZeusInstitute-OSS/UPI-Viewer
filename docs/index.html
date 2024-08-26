@@ -141,6 +141,9 @@
             text-align: center;
             margin-top: 40px;
             margin-bottom: 60px; /* Add margin to the bottom */
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
         }
 
         .features {
@@ -168,6 +171,7 @@
             margin: 0 15px 20px;
             transition: background-color 0.3s, transform 0.3s;
             font-weight: bold;
+            width: calc(45% - 20px);
         }
 
         .download-btn:hover {
@@ -210,11 +214,13 @@
             <h2>Download UPI Viewer</h2>
             <a href="#" class="download-btn">
                 <i class="fa-brands fa-google-play"></i>
-                Google Play Store(Coming Soon)
+                Google Play Store
+                (Coming Soon)
             </a>
             <a href="#" class="download-btn">
                 <i class="fa-brands fa-android"></i>
-                F-Droid(Coming Soon)
+                F-Droid
+                (Coming Soon)
             </a>
             <a href="https://github.com/ZeusInstitute-OSS/UPI-Viewer/releases" class="download-btn">
                 <i class="fa-solid fa-download"></i>
