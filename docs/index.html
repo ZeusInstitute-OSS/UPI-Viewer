@@ -1,10 +1,10 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
+<!DOCTYPE html> 
+<html lang="en"> 
+<head> 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>UPI Viewer</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
             --bg-color: #ffffff;
@@ -137,15 +137,10 @@
             transform: scale(1.05);
         }
 
-        .download {
-            text-align: center;
-            margin-top: 60px;
-            margin-bottom: 60px;
-            flex-direction: column;
-            flex-wrap: wrap;
-            align-items: center; 
-            justify-content: center;
-            gap: 20px; /* Add some gap between buttons */
+        .download { 
+            text-align: center; 
+            margin-top: 60px; 
+            margin-bottom: 60px; 
         }
         
         .download a {
@@ -169,20 +164,23 @@
             color: var(--accent-color);
             margin-bottom: 30px;
         }
-
+        
         .download-btn {
-    display: inline-flex;
-    align-items: center;
-    background-color: var(--accent-color);
-    color: #ffffff;
-    text-decoration: none;
-    padding: 15px 30px;
-    border-radius: 50px;
-    transition: background-color 0.3s, transform 0.3s;
-    font-weight: bold;
-    width: 100%; /* Make buttons take full width of their container */
-    box-sizing: border-box; /* Ensure padding is included in width calculation */
-}
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--accent-color);
+            color: #ffffff;
+            text-decoration: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            transition: background-color 0.3s, transform 0.3s;
+            font-weight: bold;
+            width: calc(50% - 10px);
+            max-width: 300px;
+            box-sizing: border-box;
+        }
+ 
     .download-btn:hover {
         background-color: #3a7bc8;
         transform: translateY(-3px);
@@ -199,51 +197,44 @@
             --accent-color: #64b5f6;
             --secondary-color: #2c2c2c;
         }
-
-        @media (max-width: 768px) {
-            .screenshot {
-                width: 80%;
-                height: auto;
-                aspect-ratio: 9 / 16;
-            }
-            .download a {
-        flex-basis: 100%; /* Make buttons stack in single column on small screens */
-        max-width: 100%; /* Allow buttons to take up full width */
-    }
+         
+        .download-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
         }
-    </style>
-</head>
-<body>
-    <div class="container">
-        <header>
-            <h1>UPI Viewer</h1>
-            <p class="desc">Turn your Phone into a UPI Speaker Box and Point Of Sale Machine</p>
-        </header>
+ 
 
-        <div class="theme-switch" id="theme-toggle">
+        @media (max-width: 768px) { 
+            .download-btn { 
+                width: 100%;
+                max-width: 100%;
+            } 
+        }
+    </style> 
+</head> 
+<body> 
+    <div class="container"> 
+        <header> 
+            <h1>UPI Viewer</h1> 
+            <p class="desc">Turn your Phone into a UPI Speaker Box and Point Of Sale Machine</p> 
+        </header> 
+ 
+        <div class="theme-switch" id="theme-toggle"> 
             <i class="fa-regular fa-sun"></i>
         </div>
+
         <div class="download">
             <h2>Download UPI Viewer</h2>
-            <a href="#" class="download-btn">
-                <i class="fa-brands fa-google-play"></i>
-                Play Store
-                (Coming Soon)
-            </a>
-            <a href="#" class="download-btn">
-                <i class="fa-brands fa-android"></i>
-                F-Droid
-                (Coming Soon)
-            </a>
-            <a href="https://github.com/ZeusInstitute-OSS/UPI-Viewer/releases/latest/download/app-debug-signed.apk" class="download-btn">
-                <i class="fa-solid fa-download"></i>
-                Github Releases
-            </a>
-            <a href="https://github.com/ZeusInstitute-OSS/UPI-Viewer" class="download-btn">
-                <i class="fa-brands fa-square-github"></i>
-                Source Code(GPL v3)
-            </a>
-        </div>
+  
+            <div class="download-buttons">
+                <a href="#" class="download-btn">Play Store (Coming Soon)</a>
+                <a href="#" class="download-btn">F-Droid (Coming Soon)</a>
+                <a href="https://github.com/ZeusInstitute-OSS/UPI-Viewer/releases/latest/download/app-debug-signed.apk" class="download-btn">Github Releases</a>
+                <a href="https://github.com/ZeusInstitute-OSS/UPI-Viewer" class="download-btn">Source Code(GPL v3)</a>
+            </div>
+        </div> 
 		
         <div class="features">
             <h2>Features</h2>
