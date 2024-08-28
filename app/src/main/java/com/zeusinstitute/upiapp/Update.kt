@@ -51,13 +51,28 @@ class UpdateFragment : Fragment() {
                 0L -> Toast.makeText(context, "Updating is disabled", Toast.LENGTH_SHORT).show()
                 47529L -> { // "gplay" encoded in T9 SMS format
                 // Try to open the Play Store listing for your app
-                try {
-                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=${requireContext().packageName}")))
-                } catch (e: ActivityNotFoundException) {
-                    // Handle cases where the Play Store app is not installed
-                    Toast.makeText(context, "Play Store not found", Toast.LENGTH_SHORT).show()
+                     try {
+                         startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=${requireContext().packageName}")))
+                     } catch (e: ActivityNotFoundException) {
+                         // Handle cases where the Play Store app is not installed
+                         Toast.makeText(context, "Play Store not found", Toast.LENGTH_SHORT).show()
+                     }
                 }
-            }
+                337643L -> { // "fdroid" encoded in T9 SMS format
+                    // Try to open the F-droid listing for your app
+                    try {
+                        val appId = "123456" // todo: Change to actual appId
+                        startActivity(
+                            Intent(
+                                Intent.ACTION_VIEW,
+                                Uri.parse("fdroid://details?package=$appId")
+                            )
+                        )
+                    } catch (e: ActivityNotFoundException) {
+                        // Handle cases where the Play Store app is not installed
+                        Toast.makeText(context, "F-Droid not found", Toast.LENGTH_SHORT).show()
+                    }
+                }
                 else -> lifecycleScope.launch { checkForUpdate() }
             }
         }
