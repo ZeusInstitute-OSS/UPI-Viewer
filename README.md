@@ -10,7 +10,7 @@ Features:
 - Split the Bill mode for multiple payees
 - Quick Updater
 - SMS based bill tracker
-- Announce transaction amount sent/recieved through Voice when enabled
+- Announce transaction amount sent/received through Voice when enabled
 - Open Source
 
 ### Build Status:
