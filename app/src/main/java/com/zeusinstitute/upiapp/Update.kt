@@ -46,6 +46,23 @@ class UpdateFragment : Fragment() {
         installButton = view.findViewById(R.id.installButton) // Find the install button
         installButton.visibility = View.GONE // Initially hide the install button
 
+
+        /* Release details
+
+        Play Store info!
+        Run these two commands to set Play Store version in the App!
+
+            sed -i "s/private val buildRunId: Long = 0/private val buildRunId: Long = 47529L/" app/src/main/java/com/zeusinstitute/upiapp/Update.kt
+            grep "private val buildRunId" app/src/main/java/com/zeusinstitute/upiapp/Update.kt
+
+        F-Droid info!
+        Run these two commands to set Play Store version in the App!
+
+            sed -i "s/private val buildRunId: Long = 0/private val buildRunId: Long = 47529L/" app/src/main/java/com/zeusinstitute/upiapp/Update.kt
+            grep "private val buildRunId" app/src/main/java/com/zeusinstitute/upiapp/Update.kt
+
+         */
+
         checkUpdateButton.setOnClickListener {
             when (buildRunId) {
                 0L -> Toast.makeText(context, "Updating is disabled", Toast.LENGTH_SHORT).show()
