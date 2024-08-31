@@ -1,7 +1,7 @@
-# Upi Viewer
+# UPI Viewer
 Open Source UPI (and eventually card) POS system for android 4 and above. 
 
-Make your old android phones into UPI Powered Point Of Sale devices!
+Make your old android phones into UPI Powered Point Of Sale devices and Amount SoundBoxes!
 
 Features:
 - Custom UPI ID
