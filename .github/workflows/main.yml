@@ -30,6 +30,31 @@ jobs:
         sed -i "s/private val buildRunId: Long = 0/private val buildRunId: Long = ${{ github.run_id }}/" app/src/main/java/com/zeusinstitute/upiapp/Update.kt
         grep "private val buildRunId" app/src/main/java/com/zeusinstitute/upiapp/Update.kt
 
+#    - name: Branding
+#      run: |
+#        #Updater
+#        sed -i 's/android:label="UPI Viewer"/android:label="Zeus UPI - DIY SoundBox"/g' app/src/main/res/navigation/nav_graph.xml
+#        
+#        # Nav graph
+#        echo "Listing Navigation Labels"
+#        grep "android:label=" app/src/main/res/navigation/nav_graph.xml
+#
+#        # Strings
+#        sed -i 's/<string name="app_name">UPI Viewer<\/string>/<string name="app_name">Zeus UPI<\/string>/g' app/src/main/res/values/strings.xml
+#
+#        echo "Listing String App name"
+#        grep "app_name" app/src/main/res/values/strings.xml
+#
+#        # TTS
+#        sed -i 's/val announcementMessage = "\${if (type == "Credit") "Received" else "Sent"} Rupees \$amount"/val announcementMessage = "\${if (type == "Credit") "Received" else "Sent"} Rupees \$amount on Zeus UPI"/g' app/src/main/java/com/zeusinstitute/upiapp/SMSService.kt
+#        echo "Listing TTS Command"
+#        grep "Rupees" app/src/main/java/com/zeusinstitute/upiapp/SMSService.kt
+#
+#        # About App
+#        sed -i 's/android:text="UPI Viewer App/android:text="Zeus UPI Viewer App/g' app/src/main/res/layout/fragment_about_app.xml
+#        echo "Listing App Description command"
+#        grep "UPI Viewer App" app/src/main/res/layout/fragment_about_app.xml
+
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build with Gradle
