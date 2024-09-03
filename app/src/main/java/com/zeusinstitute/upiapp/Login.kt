@@ -33,6 +33,8 @@ class Login : Fragment() {
     private lateinit var apikey: TextInputEditText
     private lateinit var rulesTextView: TextView
     private lateinit var smsSwitch: SwitchCompat
+    private lateinit var smsSwitchVoice: SwitchCompat
+    private var voiceEnabledForSms = false
 
     private val SMS_PERMISSION_REQUEST_CODE = 101
 
@@ -49,7 +51,11 @@ class Login : Fragment() {
 
         // Prepare smsSwitch
         smsSwitch = view.findViewById(R.id.smsSwitch)
-        initializeSmsToggle()
+        initializeSmsToggle(smsSwitch.isChecked)
+
+        // Prepare smsSwitchVoice
+        smsSwitchVoice = view.findViewById(R.id.smsSwitchVoice)
+        initializeSmsToggle(smsSwitch.isChecked)
 
         countrySpinner = view.findViewById(R.id.countrySpinner)
         paymentMethodSpinner = view.findViewById(R.id.paymentMethodSpinner)
@@ -100,17 +106,19 @@ class Login : Fragment() {
         //smsSwitch.isChecked = smsEnabled
         return view
     }
-    private fun initializeSmsToggle() {
+    private fun initializeSmsToggle(Voice: Boolean) {
         val sharedPref = requireActivity().getPreferences(Context.MODE_PRIVATE)
         val isFirstTime = sharedPref.getBoolean("first_time", true)
 
         if (isFirstTime) {
             // First time opening the app, set default and mark as not first time
             smsSwitch.isChecked = false
+            smsSwitchVoice.isChecked = false
             sharedPref.edit().putBoolean("first_time", false).apply()
         } else {
             // Not first time, load state from SharedPreferences
             smsSwitch.isChecked = sharedPref.getBoolean("sms_enabled", false)
+            smsSwitchVoice.isChecked = sharedPref.getBoolean("voice_enabled", false)
         }
 
         smsSwitch.setOnCheckedChangeListener { _, isChecked ->
@@ -118,23 +126,25 @@ class Login : Fragment() {
                 if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.RECEIVE_SMS), SMS_PERMISSION_REQUEST_CODE)
                 } else {
-                    enableSmsService()
+                    enableSmsService(Voice)
                 }
             } else {
-                disableSmsService()
+                disableSmsService(Voice)
             }
         }
     }
 
-    private fun enableSmsService() {
+    private fun enableSmsService(voice: Boolean) {
         val sharedPref = requireActivity().getPreferences(Context.MODE_PRIVATE)
         sharedPref.edit().putBoolean("sms_enabled", true).apply()
+        sharedPref.edit().putBoolean("voice_enabled", voice)
         startSMSService()
     }
 
-    private fun disableSmsService() {
+    private fun disableSmsService(voice: Boolean) {
         val sharedPref = requireActivity().getPreferences(Context.MODE_PRIVATE)
         sharedPref.edit().putBoolean("sms_enabled", false).apply()
+        sharedPref.edit().putBoolean("voice_enabled", voice)
         stopSMSService()
     }
 
@@ -221,6 +231,7 @@ class Login : Fragment() {
         val paymentMethod = paymentMethodSpinner.selectedItem.toString()
         val currency = currencySpinner.selectedItem.toString()
         val smsEnabled = smsSwitch.isChecked
+        val smsEnabledVoice = smsSwitchVoice.isChecked
 
         if (paymentMethod == "UPI") {
             val invalidReasons = getInvalidUpiIdReasons(data)
@@ -237,6 +248,7 @@ class Login : Fragment() {
             putString("payment_method", paymentMethod)
             putString("currency", currency)
             putBoolean("sms_enabled", smsEnabled)
+            putBoolean("voice_enabled", smsEnabledVoice)
             apply()
         }
 
@@ -267,11 +279,21 @@ class Login : Fragment() {
         requireContext().stopService(intent)
     }
 
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
+    private fun requestSmsPermission(voiceEnabled: Boolean) {
+        var voiceEnabledForSms = voiceEnabled // Store the value
+        // ... code to request permission ...
+    }
+
+    @Deprecated("Deprecated in Java")
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
         when (requestCode) {
             SMS_PERMISSION_REQUEST_CODE -> {
                 if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                    enableSmsService()
+                    enableSmsService(voiceEnabledForSms)
                 } else {
                     // Permission denied, disable the switch
                     smsSwitch.isChecked = false
