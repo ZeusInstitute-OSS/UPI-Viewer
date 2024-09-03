@@ -75,6 +75,15 @@
             app:layout_constraintStart_toStartOf="@+id/apikeyLayout"
             app:layout_constraintTop_toBottomOf="@+id/apikeyLayout" />
 
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/smsSwitchVoice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Enable SMS Notifications"
+            app:layout_constraintStart_toStartOf="@+id/apikeyLayout"
+            app:layout_constraintTop_toBottomOf="@+id/smsSwitch" />
+
         <Button
             android:id="@+id/submitButton"
             android:layout_width="wrap_content"
@@ -83,7 +92,7 @@
             android:text="Submit"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/smsSwitch" />
+            app:layout_constraintTop_toBottomOf="@+id/smsSwitchVoice" />
 
         <TextView
             android:id="@+id/rulesTextView"
