@@ -84,11 +84,11 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
         val sharedPref = getSharedPreferences("com.zeusinstitute.upiapp.preferences", Context.MODE_PRIVATE)
         val smsEnabled = sharedPref.getBoolean("sms_enabled", false)
 
-        if (!smsEnabled) {
-            Log.d("SMSService", "SMS is disabled. Stopping service.")
-            stopSelf()
-            return
-        }
+        //if (!smsEnabled) {
+        //    Log.d("SMSService", "SMS is disabled. Stopping service.")
+        //    stopSelf()
+        //    return
+        //}
 
         val smsIntentFilter = IntentFilter()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
@@ -120,7 +120,7 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
 
     private fun processMessage(message: String) {
         val sharedPref = getSharedPreferences("com.zeusinstitute.upiapp.preferences", Context.MODE_PRIVATE)
-        val smsEnabled = sharedPref.getBoolean("sms_enabled", false)
+        val smsEnabled = sharedPref.getBoolean("sms_enabled", true)
         val announceEnabled = sharedPref.getBoolean("announce_enabled", false)
 
         Log.d("SMSService", "Processing message: $message")
