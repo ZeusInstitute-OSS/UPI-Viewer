@@ -117,10 +117,12 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
 
     private fun processMessage(message: String) {
         val sharedPref = getSharedPreferences("com.zeusinstitute.upiapp.preferences", Context.MODE_PRIVATE)
-        val smsEnabled = sharedPref.getBoolean("sms_enabled", true)
+        val smsEnabled = sharedPref.getBoolean("sms_enabled", false)
+        val announceEnabled = sharedPref.getBoolean("announce_enabled", false)
 
         Log.d("SMSService", "Processing message: $message")
         Log.d("SMSService", "SMS Enabled: $smsEnabled")
+        Log.d("SMSService", "Announce Enabled: $announceEnabled")
 
         if (!smsEnabled) {
             Log.d("SMSService", "SMS notifications are disabled. Skipping processing.")
@@ -148,7 +150,7 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
                 }
 
                 val date = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(Date())
-                val transaction = PayTransaction(amount = amount, type = type, date = date, name = extractedName ?: "") // Use empty string if name is null
+                val transaction = PayTransaction(amount = amount, type = type, date = date, name = extractedName ?: "")
 
                 scope.launch {
                     transactionDao.insert(transaction)
@@ -156,8 +158,13 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
                 }
 
                 val announcementMessage = "${if (type == "Credit") "Received" else "Sent"} Rupees $amount"
-                Log.d("SMSService", "Queueing message: $announcementMessage")
-                messageQueue.offer(announcementMessage)
+                if (announceEnabled) {
+                    Log.d("SMSService", "Queueing message: $announcementMessage")
+                    messageQueue.offer(announcementMessage)
+                } else {
+                    Log.d("SMSService", "Announce is disabled. Skipping message queue.")
+                }
+                showNotification(announcementMessage)
             } else {
                 Log.d("SMSService", "Invalid amount format in the message")
             }
@@ -169,8 +176,14 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
             while (isActive) {
                 val message = messageQueue.poll()
                 if (message != null) {
-                    announceMessage(message)
-                    showNotification(message) // Show notification for each message
+                    val sharedPref = getSharedPreferences("com.zeusinstitute.upiapp.preferences", Context.MODE_PRIVATE)
+                    val announceEnabled = sharedPref.getBoolean("announce_enabled", false)
+
+                    if (announceEnabled) {
+                        announceMessage(message)
+                    } else {
+                        Log.d("SMSService", "Announce is disabled. Skipping announcement.")
+                    }
                 }
                 delay(1000) // Check every second
             }

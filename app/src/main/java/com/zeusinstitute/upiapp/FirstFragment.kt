@@ -185,9 +185,14 @@ class FirstFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeList
     }
 
     private fun updateSmsStatus() {
-        val sharedPref = requireActivity().getPreferences(Context.MODE_PRIVATE)
+        val sharedPref = requireActivity().getSharedPreferences("com.zeusinstitute.upiapp.preferences", Context.MODE_PRIVATE)
         val smsEnabled = sharedPref.getBoolean("sms_enabled", false)
-        smsStatusTextView.text = if (smsEnabled) "Speaker Mode Enabled" else ""
-        smsStatusTextView.visibility = if (smsEnabled) View.VISIBLE else View.GONE
+        val announceEnabled = sharedPref.getBoolean("announce_enabled", false)
+
+        Log.d("FirstFragment", "SMS Enabled: $smsEnabled")
+        Log.d("FirstFragment", "Announce Enabled: $announceEnabled")
+
+        smsStatusTextView.text = if (smsEnabled && announceEnabled) "Speaker Mode Enabled" else ""
+        smsStatusTextView.visibility = if (smsEnabled && announceEnabled) View.VISIBLE else View.GONE
     }
 }

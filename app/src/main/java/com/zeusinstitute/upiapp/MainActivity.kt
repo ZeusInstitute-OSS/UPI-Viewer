@@ -116,12 +116,17 @@ class MainActivity : AppCompatActivity() {
     }
     private fun startSMSService() {
         val intent = Intent(this, SMSService::class.java)
+        val sharedPref = getSharedPreferences("com.zeusinstitute.upiapp.preferences", Context.MODE_PRIVATE)
+        val smsEnabled = sharedPref.getBoolean("sms_enabled", false)
+        val announceEnabled = sharedPref.getBoolean("announce_enabled", false)
+
+        intent.putExtra("sms_enabled", smsEnabled)
+        intent.putExtra("announce_enabled", announceEnabled)
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            // For Android 8.0 and above
-            startForegroundService(this, intent)
+            startForegroundService(intent)
         } else {
-            // For older Android versions (Jelly Bean and KitKat)
-            ContextCompat.startForegroundService(this, intent)
+            startService(intent)
         }
     }
 

@@ -32,7 +32,9 @@ class Login : Fragment() {
     private lateinit var apikeyLayout: TextInputLayout
     private lateinit var apikey: TextInputEditText
     private lateinit var rulesTextView: TextView
+
     private lateinit var smsSwitch: SwitchCompat
+    private lateinit var announceSwitch: SwitchCompat
 
     private val SMS_PERMISSION_REQUEST_CODE = 101
 
@@ -47,8 +49,9 @@ class Login : Fragment() {
         val submitButton = view.findViewById<Button>(R.id.submitButton)
         rulesTextView = view.findViewById(R.id.rulesTextView)
 
-        // Prepare smsSwitch
+        // Prepare smsSwitch and announceSwitch
         smsSwitch = view.findViewById(R.id.smsSwitch)
+        announceSwitch = view.findViewById(R.id.announceSwitch)
         initializeSmsToggle()
 
         countrySpinner = view.findViewById(R.id.countrySpinner)
@@ -107,21 +110,39 @@ class Login : Fragment() {
         if (isFirstTime) {
             // First time opening the app, set default and mark as not first time
             smsSwitch.isChecked = false
+            announceSwitch.isChecked = false
+            announceSwitch.visibility = View.GONE
             sharedPref.edit().putBoolean("first_time", false).apply()
         } else {
             // Not first time, load state from SharedPreferences
             smsSwitch.isChecked = sharedPref.getBoolean("sms_enabled", false)
+            announceSwitch.isChecked = sharedPref.getBoolean("announce_enabled", false)
+            announceSwitch.visibility = if (smsSwitch.isChecked) View.VISIBLE else View.GONE
         }
 
         smsSwitch.setOnCheckedChangeListener { _, isChecked ->
             if (isChecked) {
                 if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.RECEIVE_SMS), SMS_PERMISSION_REQUEST_CODE)
+                    enableSmsService()
                 } else {
                     enableSmsService()
                 }
             } else {
                 disableSmsService()
+            }
+            announceSwitch.visibility = if (isChecked) View.VISIBLE else View.GONE
+            if (!isChecked) {
+                announceSwitch.isChecked = false
+                disableAnnounceService()
+            }
+        }
+
+        announceSwitch.setOnCheckedChangeListener { _, isChecked ->
+            if (isChecked) {
+                enableAnnounceService()
+            } else {
+                disableAnnounceService()
             }
         }
     }
@@ -136,6 +157,23 @@ class Login : Fragment() {
         val sharedPref = requireActivity().getPreferences(Context.MODE_PRIVATE)
         sharedPref.edit().putBoolean("sms_enabled", false).apply()
         stopSMSService()
+    }
+
+    private fun enableAnnounceService() {
+        val sharedPref = requireActivity().getPreferences(Context.MODE_PRIVATE)
+        sharedPref.edit()
+            .putBoolean("announce_enabled", true)
+            .putBoolean("sms_enabled", true)  // Ensure SMS is enabled when announce is enabled
+            .apply()
+        stopSMSService()
+        startSMSService()
+    }
+
+    private fun disableAnnounceService() {
+        val sharedPref = requireActivity().getPreferences(Context.MODE_PRIVATE)
+        sharedPref.edit().putBoolean("announce_enabled", false).apply()
+        stopSMSService()
+        startSMSService()
     }
 
     private fun setupSpinners() {
@@ -220,7 +258,9 @@ class Login : Fragment() {
         val country = countrySpinner.selectedItem.toString()
         val paymentMethod = paymentMethodSpinner.selectedItem.toString()
         val currency = currencySpinner.selectedItem.toString()
+
         val smsEnabled = smsSwitch.isChecked
+        val announceEnabled = announceSwitch.isChecked
 
         if (paymentMethod == "UPI") {
             val invalidReasons = getInvalidUpiIdReasons(data)
@@ -237,8 +277,12 @@ class Login : Fragment() {
             putString("payment_method", paymentMethod)
             putString("currency", currency)
             putBoolean("sms_enabled", smsEnabled)
+            putBoolean("announce_enabled", announceEnabled)
             apply()
         }
+
+        Log.d("Login", "SMS Enabled (after set): ${sharedPref.getBoolean("sms_enabled", false)}")
+        Log.d("Login", "Announce Enabled (after set): ${sharedPref.getBoolean("announce_enabled", false)}")
 
         // Toggle SMS service based on switch state
         if (smsEnabled) {
