@@ -185,7 +185,7 @@ class FirstFragment : Fragment(), SharedPreferences.OnSharedPreferenceChangeList
     }
 
     private fun updateSmsStatus() {
-        val sharedPref = requireActivity().getSharedPreferences("com.zeusinstitute.upiapp.preferences", Context.MODE_PRIVATE)
+        val sharedPref = requireActivity().getPreferences(Context.MODE_PRIVATE)
         val smsEnabled = sharedPref.getBoolean("sms_enabled", false)
         val announceEnabled = sharedPref.getBoolean("announce_enabled", false)
 

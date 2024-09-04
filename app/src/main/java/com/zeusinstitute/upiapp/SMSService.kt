@@ -34,6 +34,8 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
     private lateinit var db: AppDatabase
     lateinit var transactionDao: TransactionDao
 
+    private var receiversRegistered = false
+
     companion object {
         const val STOP_SERVICE = "STOP_SERVICE"
     }
@@ -79,23 +81,24 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
         this.db = (applicationContext as UPIAPP).database
         transactionDao = db.transactionDao() // Initialize transactionDao
 
+        val sharedPref = getSharedPreferences("com.zeusinstitute.upiapp.preferences", Context.MODE_PRIVATE)
+        val smsEnabled = sharedPref.getBoolean("sms_enabled", false)
+
+        if (!smsEnabled) {
+            Log.d("SMSService", "SMS is disabled. Stopping service.")
+            stopSelf()
+            return
+        }
+
         val smsIntentFilter = IntentFilter()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT){
             smsIntentFilter.addAction(Telephony.Sms.Intents.SMS_RECEIVED_ACTION)
         } else {
             smsIntentFilter.addAction("android.provider.Telephony.SMS_RECEIVED")
         }
-        registerReceiver(smsReceiver, smsIntentFilter)
+        registerReceivers()
 
-        startMessageProcessing()
-
-        val filter = IntentFilter(STOP_SERVICE)
-
-        if (Build.VERSION.SDK_INT >= 33 ){
-            registerReceiver(stopReceiver, filter, RECEIVER_NOT_EXPORTED)
-        } else {
-            registerReceiver(stopReceiver, filter)
-        }
+        receiversRegistered = true
 
         notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
@@ -259,12 +262,36 @@ class SMSService : Service(), TextToSpeech.OnInitListener {
         }
     }
 
+    private fun registerReceivers() {
+        if (!receiversRegistered) {
+            val smsIntentFilter = IntentFilter()
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                smsIntentFilter.addAction(Telephony.Sms.Intents.SMS_RECEIVED_ACTION)
+            } else {
+                smsIntentFilter.addAction("android.provider.Telephony.SMS_RECEIVED")
+            }
+            receiversRegistered = true
+        }
+    }
+
+
+    private fun unregisterReceivers() {
+        if (receiversRegistered) {
+            try {
+                unregisterReceiver(smsReceiver)
+                unregisterReceiver(stopReceiver)
+            } catch (e: IllegalArgumentException) {
+                Log.e("SMSService", "Error unregistering receivers", e)
+            }
+            receiversRegistered = false
+        }
+    }
+
     override fun onBind(intent: Intent?): IBinder? = null
 
     override fun onDestroy() {
         super.onDestroy()
-        unregisterReceiver(smsReceiver)
-        unregisterReceiver(stopReceiver)
+        unregisterReceivers()
         job.cancel()
         tts?.shutdown()
     }

@@ -103,6 +103,7 @@ class Login : Fragment() {
         //smsSwitch.isChecked = smsEnabled
         return view
     }
+
     private fun initializeSmsToggle() {
         val sharedPref = requireActivity().getPreferences(Context.MODE_PRIVATE)
         val isFirstTime = sharedPref.getBoolean("first_time", true)
@@ -124,7 +125,6 @@ class Login : Fragment() {
             if (isChecked) {
                 if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.RECEIVE_SMS) != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(requireActivity(), arrayOf(Manifest.permission.RECEIVE_SMS), SMS_PERMISSION_REQUEST_CODE)
-                    enableSmsService()
                 } else {
                     enableSmsService()
                 }
