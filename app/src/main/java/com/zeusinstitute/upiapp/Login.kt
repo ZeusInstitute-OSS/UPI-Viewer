@@ -111,6 +111,7 @@ class Login : Fragment() {
         } else {
             // Not first time, load state from SharedPreferences
             smsSwitch.isChecked = sharedPref.getBoolean("sms_enabled", false)
+            apikey.setText(sharedPref.getString("saved_data", "null"))
         }
 
         smsSwitch.setOnCheckedChangeListener { _, isChecked ->
