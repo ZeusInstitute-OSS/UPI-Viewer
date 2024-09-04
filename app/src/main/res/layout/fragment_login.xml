@@ -62,7 +62,8 @@
                 android:ems="10"
                 android:hint="Enter Payment ID"
                 android:inputType="text"
-                android:minHeight="48dp" />
+                android:minHeight="48dp"
+                android:drawableEnd="@drawable/edit_icon"/>
 
         </com.google.android.material.textfield.TextInputLayout>
 
