@@ -27,7 +27,8 @@ jobs:
 
     - name: Versioning
       run: |
-        sed -i "s/private val buildRunId: Long = 0/private val buildRunId: Long = ${{ github.run_id }}/" app/src/main/java/com/zeusinstitute/upiapp/Update.kt
+        sed -i "s/private val buildRunId: Long = 0/private val buildRunId: Long = 47529L/" app/src/main/java/com/zeusinstitute/upiapp/Update.kt
+        #sed -i "s/private val buildRunId: Long = 0/private val buildRunId: Long = ${{ github.run_id }}/" app/src/main/java/com/zeusinstitute/upiapp/Update.kt
         grep "private val buildRunId" app/src/main/java/com/zeusinstitute/upiapp/Update.kt
 
     - name: Branding
@@ -106,7 +107,7 @@ jobs:
 #        BUILD_TOOLS_VERSION: ${{ env.BUILD_TOOL_VERSION }}
 
     - name: Upload Artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
           name: App-Artifact
           path: |
