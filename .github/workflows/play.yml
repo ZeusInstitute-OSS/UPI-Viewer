@@ -1,0 +1,124 @@
+name: Android CI - Play Store
+
+on:
+  push:
+    branches: [ "kotlin" ]
+  #pull_request:
+  #  branches: [ "kotlin" ]
+  workflow_dispatch:
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: gradle
+    - name: Initialize repo
+      run: |
+        git config --global user.name "sounddrill31"
+        git config --global user.email "sounddrill31@gmail.com"
+      id: pwd
+
+    - name: Versioning
+      run: |
+        sed -i "s/private val buildRunId: Long = 0/private val buildRunId: Long = ${{ github.run_id }}/" app/src/main/java/com/zeusinstitute/upiapp/Update.kt
+        grep "private val buildRunId" app/src/main/java/com/zeusinstitute/upiapp/Update.kt
+
+    - name: Branding
+      run: |
+        #Updater
+        sed -i 's/android:label="UPI Viewer"/android:label="Zeus UPI - DIY SoundBox"/g' app/src/main/res/navigation/nav_graph.xml
+        
+        # Nav graph
+        echo "Listing Navigation Labels"
+        grep "android:label=" app/src/main/res/navigation/nav_graph.xml
+
+        # Strings
+        sed -i 's/<string name="app_name">UPI Viewer<\/string>/<string name="app_name">Zeus UPI<\/string>/g' app/src/main/res/values/strings.xml
+
+        echo "Listing String App name"
+        grep "app_name" app/src/main/res/values/strings.xml
+
+        # TTS
+        sed -i 's/val announcementMessage = "\${if (type == "Credit") "Received" else "Sent"} Rupees \$amount"/val announcementMessage = "\${if (type == "Credit") "Received" else "Sent"} Rupees \$amount on Zeus UPI"/g' app/src/main/java/com/zeusinstitute/upiapp/SMSService.kt
+        echo "Listing TTS Command"
+        grep "Rupees" app/src/main/java/com/zeusinstitute/upiapp/SMSService.kt
+
+        # About App
+        sed -i 's/android:text="UPI Viewer App/android:text="Zeus UPI Viewer App/g' app/src/main/res/layout/fragment_about_app.xml
+        echo "Listing App Description command"
+        grep "UPI Viewer App" app/src/main/res/layout/fragment_about_app.xml
+
+#    - name: Grant execute permission for gradlew
+#      run: chmod +x gradlew
+#    - name: Build with Gradle
+#      run: ./gradlew assembleDebug
+
+    # Setup Ruby
+    - uses: actions/setup-ruby@v1
+      with:
+        ruby-version: '2.6'
+    - name: Install bundle
+      run: |
+          bundle config path vendor/bundle
+          bundle install --jobs 4 --retry 3
+
+    - name: Configure Keystore
+      run: |
+        echo "$ANDROID_KEYSTORE_FILE" > keystore.jks.b64
+        base64 -d -i keystore.jks.b64 > app/keystore.jks
+        echo "storeFile=keystore.jks" >> keystore.properties
+        echo "keyAlias=$KEYSTORE_KEY_ALIAS" >> keystore.properties
+        echo "storePassword=$KEYSTORE_STORE_PASSWORD" >> keystore.properties
+        echo "keyPassword=$KEYSTORE_KEY_PASSWORD" >> keystore.properties
+      env:
+        ANDROID_KEYSTORE_FILE: ${{ secrets.SIGNINGKEYBASE64 }}
+        KEYSTORE_KEY_ALIAS: ${{ secrets.ALIAS }}
+        KEYSTORE_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        KEYSTORE_STORE_PASSWORD: ${{ secrets.KEYSTORE_STORE_PASSWORD }}
+
+    - name: Create Google Play Config file
+      run : |
+        echo "$PLAY_CONFIG_JSON" > play_config.json.b64
+        base64 -d -i play_config.json.b64 > play_config.json
+      env:
+        PLAY_CONFIG_JSON: ${{ secrets.PLAY_CONFIG_JSON }}
+
+    - name: Distribute app to Beta track 🚀
+      run: bundle exec fastlane beta
+
+#    - name: Sign apk
+#      uses: r0adkll/sign-android-release@v1
+#      id: sign_app
+#      with:
+#        releaseDirectory: app/build/outputs/apk/debug
+#        signingKeyBase64: ${{ secrets.SIGNINGKEYBASE64 }}
+#        alias: ${{ secrets.ALIAS }}
+#        keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+#        keyPassword: ${{ secrets.KEY_PASSWORD }}
+#      env:
+#        BUILD_TOOLS_VERSION: ${{ env.BUILD_TOOL_VERSION }}
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v2
+      with:
+          name: App-Artifact
+          path: |
+            app/build/outputs/apk/*/*.apk
+
+#    - name: Upload to Release
+#      uses: xresloader/upload-to-github-release@v1
+#      with:
+#        file: |
+#          app/build/outputs/apk/*/*.apk
+#        default_release_name: Bleeding Edge ${{ github.run_id }} ${{ github.event.head_commit.timestamp }}
+#        tag_name: ${{ github.run_id }} 
+#        draft: false
+#      env:
+#        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
