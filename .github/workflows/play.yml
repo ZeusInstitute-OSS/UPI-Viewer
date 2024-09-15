@@ -90,8 +90,8 @@ jobs:
       env:
         PLAY_CONFIG_JSON: ${{ secrets.PLAY_CONFIG_JSON }}
 
-    - name: Distribute app to Beta track 🚀
-      run: bundle exec fastlane beta
+    - name: Distribute app to internal track 🚀
+      run: bundle exec fastlane internal
 
 #    - name: Sign apk
 #      uses: r0adkll/sign-android-release@v1
