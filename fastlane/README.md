@@ -15,10 +15,10 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 ## Android
 
-### android test
+### android beta
 
 ```sh
-[bundle exec] fastlane android test
+[bundle exec] fastlane android beta
 ```
 
 Runs all the tests
