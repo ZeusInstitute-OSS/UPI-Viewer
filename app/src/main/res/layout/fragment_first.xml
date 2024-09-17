@@ -69,6 +69,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
+            app:elevation="0dp"
             android:clickable="true"
             android:src="@android:drawable/ic_dialog_info" />
 
@@ -90,6 +91,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="10dp"
+            app:elevation="0dp"
             android:clickable="true"
             app:srcCompat="@drawable/currency_rupee_24px" />
 
@@ -98,6 +100,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="10dp"
+            app:elevation="0dp"
             android:clickable="true"
             app:srcCompat="@drawable/receipt_long_24px" />
 
@@ -106,6 +109,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginEnd="10dp"
+            app:elevation="0dp"
             android:clickable="true"
             android:src="@drawable/wallet_24px" />
 
@@ -113,6 +117,7 @@
             android:id="@+id/updateAppButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:elevation="0dp"
             android:clickable="true"
             app:srcCompat="@drawable/update_24px" />
 
