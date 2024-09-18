@@ -49,7 +49,8 @@
         <activity
             android:name=".Login"
             android:exported="true"
-            android:parentActivityName=".MainActivity" >
+            android:parentActivityName=".MainActivity"
+            tools:ignore="Instantiatable" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity" />
