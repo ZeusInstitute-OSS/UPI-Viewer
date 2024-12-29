@@ -92,6 +92,16 @@ jobs:
       env:
         PLAY_CONFIG_JSON: ${{ secrets.PLAY_CONFIG_JSON }}
 
+    - name: Build app
+      run: ./gradlew bundleRelease
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v3
+      with:
+          name: App-Artifact
+          path: |
+            app/build/outputs/bundle/*/*.aab
+
     - name: Distribute app to deploy track 🚀
       run: bundle exec fastlane deploy
 
@@ -106,13 +116,6 @@ jobs:
 #        keyPassword: ${{ secrets.KEY_PASSWORD }}
 #      env:
 #        BUILD_TOOLS_VERSION: ${{ env.BUILD_TOOL_VERSION }}
-
-    - name: Upload Artifact
-      uses: actions/upload-artifact@v3
-      with:
-          name: App-Artifact
-          path: |
-            app/build/outputs/apk/*/*.apk
 
 #    - name: Upload to Release
 #      uses: xresloader/upload-to-github-release@v1
