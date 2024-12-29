@@ -68,7 +68,7 @@ jobs:
         
         ./gradlew bundleDebug
 
-        if [ -d "backup_apk" ]; then
+        if[ -f "backup_apk/*" ]; then
           mkdir -p app/build/outputs/apk/
           mv backup_apk/* app/build/outputs/apk/
           rm -rf backup_apk
