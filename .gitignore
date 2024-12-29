@@ -16,3 +16,4 @@ local.properties
 /.idea
 
 play_config.json
+Gemfile.lock
