@@ -58,7 +58,21 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build with Gradle
-      run: ./gradlew assembleDebug; ./gradlew bundleDebug
+      run: |
+        ./gradlew assembleDebug
+        
+        if[ -f "app/build/outputs/apk/*/*.apk" ]; then
+          mkdir -p backup_apk
+          mv app/build/outputs/apk/* backup_apk
+        fi
+        
+        ./gradlew bundleDebug
+
+        if [-d "backup_apk" ]; then
+          mkdir -p app/build/outputs/apk/
+          mv backup_apk/* app/build/outputs/apk/
+          rm -rf backup_apk
+        fi
 
     - name: Get Build Tool Version
       shell: bash
