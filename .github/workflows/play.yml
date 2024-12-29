@@ -83,7 +83,7 @@ jobs:
         ANDROID_KEYSTORE_FILE: ${{ secrets.SIGNINGKEYBASE64 }}
         KEYSTORE_KEY_ALIAS: ${{ secrets.ALIAS }}
         KEYSTORE_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-        KEYSTORE_STORE_PASSWORD: ${{ secrets.KEYSTORE_STORE_PASSWORD }}
+        KEYSTORE_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
 
     - name: Create Google Play Config file
       run : |
