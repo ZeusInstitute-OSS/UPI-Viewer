@@ -58,7 +58,7 @@ jobs:
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
     - name: Build with Gradle
-      run: ./gradlew assembleDebug
+      run: ./gradlew assembleDebug; ./gradlew bundleDebug
 
     - name: Get Build Tool Version
       shell: bash
@@ -79,18 +79,32 @@ jobs:
       env:
         BUILD_TOOLS_VERSION: ${{ env.BUILD_TOOL_VERSION }}
 
+    - name: Sign aab bundle
+      uses: r0adkll/sign-android-release@v1
+      id: sign_app_bundle
+      with:
+        releaseDirectory: app/build/outputs/apk/debug
+        signingKeyBase64: ${{ secrets.SIGNINGKEYBASE64 }}
+        alias: ${{ secrets.ALIAS }}
+        keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+        keyPassword: ${{ secrets.KEY_PASSWORD }}
+      env:
+        BUILD_TOOLS_VERSION: ${{ env.BUILD_TOOL_VERSION }}
+
     - name: Upload Artifact
       uses: actions/upload-artifact@v3
       with:
           name: App-Artifact
           path: |
             app/build/outputs/apk/*/*.apk
+            app/build/outputs/bundle/*/*.aab
 
     - name: Upload to Release
       uses: xresloader/upload-to-github-release@v1
       with:
         file: |
           app/build/outputs/apk/*/*.apk
+          app/build/outputs/bundle/*/*.aab
         default_release_name: Bleeding Edge ${{ github.run_id }} ${{ github.event.head_commit.timestamp }}
         tag_name: ${{ github.run_id }} 
         draft: false
